@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "450940589937",
+    "project_id": "mobile-accessories-fyp",
+    "storage_bucket": "mobile-accessories-fyp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:450940589937:android:47329c78b04982ea7048d0",
+        "android_client_info": {
+          "package_name": "com.fyp.mobileaccessories.stockcontrol"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEpC7wUwkKqJBYyh0YBkIKrIpfsufIucE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
