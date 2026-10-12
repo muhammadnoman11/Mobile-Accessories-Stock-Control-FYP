@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.fyp.mobileaccessories.stockcontrol.navigation.Screen
+import com.fyp.mobileaccessories.stockcontrol.navigation.navigateAndClear
 import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTextField
 import com.fyp.mobileaccessories.stockcontrol.ui.component.DropdownField
 import com.fyp.mobileaccessories.stockcontrol.ui.component.PrimaryButton
@@ -37,9 +39,11 @@ fun RegisterScreen(
 ) {
     val state by viewModel.registerState.collectAsStateWithLifecycle()
 
-    // After success, go to login so they sign in with new account
+    // After success, auto login and navigate to home screen
     LaunchedEffect(state.isSuccess) {
-        if (state.isSuccess) navController.navigateUp()
+        if (state.isSuccess) {
+            navController.navigateAndClear(Screen.UserHome.route)
+        }
     }
 
     Scaffold(

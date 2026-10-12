@@ -107,11 +107,25 @@ fun StatCard(
                     .background(contentColor.copy(alpha = 0.15f), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(24.dp))
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = contentColor,
+                    modifier = Modifier.size(24.dp)
+                )
             }
             Column {
-                Text(title, style = MaterialTheme.typography.bodySmall, color = contentColor.copy(alpha = 0.7f))
-                Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = contentColor)
+                Text(
+                    title,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = contentColor.copy(alpha = 0.7f)
+                )
+                Text(
+                    value,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = contentColor
+                )
             }
         }
     }
@@ -207,7 +221,11 @@ fun SearchBar(
         trailingIcon = {
             if (query.isNotEmpty()) {
                 IconButton(onClick = { onQueryChange("") }) {
-                    Icon(Icons.Default.Close, contentDescription = "Clear", tint = AppColors.TextSecondary)
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "Clear",
+                        tint = AppColors.TextSecondary
+                    )
                 }
             }
         },
@@ -252,9 +270,18 @@ fun AppTextField(
             value = value,
             onValueChange = onValueChange,
             label = { Text(label) },
-            placeholder = if (placeholder.isNotEmpty()) ({ Text(placeholder, color = AppColors.TextTertiary) }) else null,
+            placeholder = if (placeholder.isNotEmpty()) ({
+                Text(
+                    placeholder,
+                    color = AppColors.TextTertiary
+                )
+            }) else null,
             leadingIcon = if (leadingIcon != null) ({
-                Icon(leadingIcon, contentDescription = null, tint = if (isError) AppColors.Error else AppColors.TextSecondary)
+                Icon(
+                    leadingIcon,
+                    contentDescription = null,
+                    tint = if (isError) AppColors.Error else AppColors.TextSecondary
+                )
             }) else null,
             trailingIcon = when {
                 isPassword -> ({
@@ -266,6 +293,7 @@ fun AppTextField(
                         )
                     }
                 })
+
                 trailingIcon != null -> trailingIcon
                 else -> null
             },
@@ -316,13 +344,21 @@ fun PrimaryButton(
         colors = ButtonDefaults.buttonColors(containerColor = AppColors.Primary)
     ) {
         if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
+            CircularProgressIndicator(
+                modifier = Modifier.size(20.dp),
+                color = Color.White,
+                strokeWidth = 2.dp
+            )
         } else {
             if (icon != null) {
                 Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
             }
-            Text(text, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+            Text(
+                text,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }
@@ -390,7 +426,12 @@ fun EmptyState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Icon(icon, contentDescription = null, modifier = Modifier.size(64.dp), tint = AppColors.TextTertiary)
+        Icon(
+            icon,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp),
+            tint = AppColors.TextTertiary
+        )
         Text(message, style = MaterialTheme.typography.bodyMedium, color = AppColors.TextSecondary)
         if (action.isNotEmpty()) {
             OutlinedButton(onClick = onAction) { Text(action) }
@@ -433,9 +474,16 @@ fun ConfirmDialog(
 @Composable
 fun LoadingScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             CircularProgressIndicator(color = AppColors.Primary)
-            Text("Loading...", style = MaterialTheme.typography.bodyMedium, color = AppColors.TextSecondary)
+            Text(
+                "Loading...",
+                style = MaterialTheme.typography.bodyMedium,
+                color = AppColors.TextSecondary
+            )
         }
     }
 }
@@ -486,15 +534,40 @@ fun ProductCard(
                     )
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(description, style = MaterialTheme.typography.bodySmall, color = AppColors.TextSecondary, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text(
+                        name,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AppColors.TextSecondary,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("Rs. ${"%,.0f".format(price)}", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = AppColors.Primary)
+                    Text(
+                        "Rs. ${"%,.0f".format(price)}",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.Primary
+                    )
                     if (!isApproved) {
                         Spacer(Modifier.height(4.dp))
-                        Surface(shape = RoundedCornerShape(20.dp), color = AppColors.WarningContainer) {
-                            Text("Pending", style = MaterialTheme.typography.labelSmall, color = AppColors.Warning, modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
+                        Surface(
+                            shape = RoundedCornerShape(20.dp),
+                            color = AppColors.WarningContainer
+                        ) {
+                            Text(
+                                "Pending",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = AppColors.Warning,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                            )
                         }
                     }
                 }
@@ -538,12 +611,22 @@ fun ProductCard(
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     if (onEdit != null) {
                         IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
-                            Icon(Icons.Default.Edit, contentDescription = "Edit", tint = AppColors.Primary, modifier = Modifier.size(18.dp))
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = "Edit",
+                                tint = AppColors.Primary,
+                                modifier = Modifier.size(18.dp)
+                            )
                         }
                     }
                     if (onDelete != null) {
                         IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = AppColors.Error, modifier = Modifier.size(18.dp))
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                tint = AppColors.Error,
+                                modifier = Modifier.size(18.dp)
+                            )
                         }
                     }
                 }
@@ -597,24 +680,50 @@ fun UserCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("$firstName $lastName", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                    Text(
+                        "$firstName $lastName",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
                     RoleBadge(role)
                 }
-                Text(email, style = MaterialTheme.typography.bodySmall, color = AppColors.TextSecondary)
-                Text(contactNo, style = MaterialTheme.typography.bodySmall, color = AppColors.TextSecondary)
+                Text(
+                    email,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AppColors.TextSecondary
+                )
+                Text(
+                    contactNo,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AppColors.TextSecondary
+                )
                 if (!isActive) {
-                    Text("Inactive", style = MaterialTheme.typography.labelSmall, color = AppColors.Error)
+                    Text(
+                        "Inactive",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = AppColors.Error
+                    )
                 }
             }
             Column(horizontalAlignment = Alignment.End) {
                 if (onEdit != null) {
                     IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit", tint = AppColors.Primary, modifier = Modifier.size(18.dp))
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = "Edit",
+                            tint = AppColors.Primary,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
                 }
                 if (onDelete != null) {
                     IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = AppColors.Error, modifier = Modifier.size(18.dp))
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Delete",
+                            tint = AppColors.Error,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
                 }
             }
@@ -651,10 +760,24 @@ fun GradientHeaderCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Icon(icon, contentDescription = null, modifier = Modifier.size(48.dp), tint = Color.White.copy(alpha = 0.9f))
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp),
+                    tint = Color.White.copy(alpha = 0.9f)
+                )
                 Column {
-                    Text(title, style = MaterialTheme.typography.headlineSmall, color = Color.White, fontWeight = FontWeight.Bold)
-                    Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.8f))
+                    Text(
+                        title,
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        subtitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.8f)
+                    )
                 }
             }
         }
@@ -705,7 +828,6 @@ fun DropdownField(
         }
     }
 }
-
 
 
 // ── Product Image Helper ──────────────────────────────────────────

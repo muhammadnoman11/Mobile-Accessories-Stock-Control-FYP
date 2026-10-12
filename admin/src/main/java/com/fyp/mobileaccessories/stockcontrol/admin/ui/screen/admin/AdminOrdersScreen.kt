@@ -118,6 +118,9 @@ private fun OrderCard(order: OrderEntity, viewModel: AdminViewModel, onUpdate: (
     val product by produceState<com.fyp.mobileaccessories.stockcontrol.data.local.entity.ProductEntity?>(initialValue = null, order.productId) {
         value = viewModel.getProductById(order.productId)
     }
+    val user by produceState<com.fyp.mobileaccessories.stockcontrol.data.local.entity.UserEntity?>(initialValue = null, order.userId) {
+        value = viewModel.getUserById(order.userId)
+    }
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -159,14 +162,24 @@ private fun OrderCard(order: OrderEntity, viewModel: AdminViewModel, onUpdate: (
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
                     Text(
-                        "User ID: ${order.userId} • Qty: ${order.quantity} • Rs. ${"%,.0f".format(order.totalAmount)}",
+                        "Qty: ${order.quantity} • Rs. ${"%,.0f".format(order.totalAmount)}",
                         style = MaterialTheme.typography.bodySmall, color = AppColors.TextSecondary
                     )
                 }
             }
             Text(
+                "Customer: ${user?.firstName ?: ""} ${user?.lastName ?: "User #${order.userId}"}",
+                style = MaterialTheme.typography.bodySmall,
+                color = AppColors.TextSecondary
+            )
+            Text(
                 "Payment: ${PaymentMode.displayName(order.paymentMode)}",
                 style = MaterialTheme.typography.bodySmall, color = AppColors.TextSecondary
+            )
+            Text(
+                "Contact No: ${user?.contactNo ?: "—"}",
+                style = MaterialTheme.typography.bodySmall,
+                color = AppColors.TextSecondary
             )
             Text("Address: ${order.deliveryAddress}", style = MaterialTheme.typography.bodySmall)
             Text(

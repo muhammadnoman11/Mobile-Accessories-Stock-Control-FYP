@@ -230,21 +230,33 @@ class UserViewModel @Inject constructor(
     // ──────────────────────────────────────────────────────────
     // ANNOUNCEMENTS — active ones shown to users
     // ──────────────────────────────────────────────────────────
+    val welcomeAnnouncements: StateFlow<List<AnnouncementEntity>> =
+        announcementRepo.getActiveAnnouncements()
+            .map { list -> list.filter { it.type == "WELCOME" } }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
     val announcements: StateFlow<List<AnnouncementEntity>> =
         announcementRepo.getActiveAnnouncements()
+            .map { list -> list.filter { it.type != "WELCOME" } }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     // ──────────────────────────────────────────────────────────
     // USER PROFILE
     // ──────────────────────────────────────────────────────────
-    private val _profile = MutableStateFlow<UserEntity?>(null)
-    val profile = _profile.asStateFlow()
+    // ── USER PROFILE (Reactive) ───────────────────────────────
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val profile: StateFlow<UserEntity?> = sessionManager.sessionFlow
+        .flatMapLatest { session ->
+            if (session != null) {
+                userRepo.getAllUsers().map { users -> users.find { it.id == session.userId } }
+            } else {
+                flowOf(null)
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     fun loadProfile() {
-        viewModelScope.launch {
-            val activeSession = sessionManager.sessionFlow.first() ?: return@launch
-            _profile.value = userRepo.getUserById(activeSession.userId)
-        }
+        // Reactive stream automatically handles loading and updates
     }
 
     fun updateProfile(
@@ -259,8 +271,14 @@ class UserViewModel @Inject constructor(
                 return@launch
             }
 
-            val current =
-                _profile.value ?: run { onDone(false, "Profile not loaded"); return@launch }
+            val sessionId = sessionManager.sessionFlow.first()?.userId ?: run {
+                onDone(false, "Not logged in")
+                return@launch
+            }
+            val current = userRepo.getUserById(sessionId) ?: run {
+                onDone(false, "Profile not found")
+                return@launch
+            }
             val updated = current.copy(
                 firstName = firstName.trim(),
                 lastName = lastName.trim(),
@@ -279,7 +297,6 @@ class UserViewModel @Inject constructor(
                     name = "${updated.firstName} ${updated.lastName}",
                     email = updated.email
                 )
-                _profile.value = updated
                 onDone(true, "Profile updated successfully")
             } catch (e: Exception) {
                 onDone(false, e.message ?: "Update failed")

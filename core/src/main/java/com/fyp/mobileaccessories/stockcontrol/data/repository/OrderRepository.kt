@@ -43,15 +43,27 @@ class OrderRepository @Inject constructor(
         orderDao.updateOrderStatus(orderId, status)
         remoteSyncManager.updateOrderStatus(orderId, status)
 
+        // Automatically sync corresponding pending transaction status
+        val tx = transactionDao.getTransactionByOrderId(orderId)
+        if (tx != null && tx.status == "PENDING") {
+            if (status in listOf("CONFIRMED", "DISPATCHED", "DELIVERED")) {
+                transactionDao.updateTransactionStatus(tx.id, "APPROVED", "Auto-approved via order status ($status)")
+                remoteSyncManager.updateTransactionStatus(tx.id, "APPROVED", "Auto-approved via order status ($status)")
+            } else if (status == "CANCELLED") {
+                transactionDao.updateTransactionStatus(tx.id, "REJECTED", "Auto-rejected via order status ($status)")
+                remoteSyncManager.updateTransactionStatus(tx.id, "REJECTED", "Auto-rejected via order status ($status)")
+            }
+        }
+
         val order = orderDao.getOrderById(orderId)
         val product = if (order != null) productDao.getProductById(order.productId) else null
 
         if (order != null) {
             val title = "Order Status Update"
             val body = if (product != null) {
-                "Your Order #$orderId (${product.name}) status is now $status"
+                "Your Order #$orderId (${product.name}) is now $status"
             } else {
-                "Your Order #$orderId status is now $status"
+                "Your Order #$orderId is now $status"
             }
 
             val imageUrl = product?.imageUrl ?: ""
@@ -109,7 +121,7 @@ class OrderRepository @Inject constructor(
 
             Result.success(orderId)
         } catch (e: Exception) {
-            android.util.Log.e("OrderRepo", "Place order failed: ${e.message}", e)
+            Log.e("OrderRepo", "Place order failed: ${e.message}", e)
             Result.failure(e)
         }
     }

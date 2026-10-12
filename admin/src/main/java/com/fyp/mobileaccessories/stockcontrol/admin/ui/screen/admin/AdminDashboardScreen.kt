@@ -43,8 +43,6 @@ fun AdminDashboardScreen(
     val stats by viewModel.stats.collectAsStateWithLifecycle()
     val isOnline by viewModel.isOnline.collectAsStateWithLifecycle()
 
-    RequestNotificationPermissionEffect()
-
     // Load fresh stats whenever screen is composed
     LaunchedEffect(Unit) { viewModel.loadDashboardStats() }
 
@@ -191,9 +189,9 @@ fun AdminDashboardScreen(
                 if (isEmployee) {
                     adminMenuItems.filter {
                         it.route == Screen.ManageProducts.route ||
-                        it.route == Screen.ManageCategories.route ||
-                        it.route == Screen.StockReport.route ||
-                        it.route == Screen.AdminProfile.route
+                                it.route == Screen.ManageCategories.route ||
+                                it.route == Screen.StockReport.route ||
+                                it.route == Screen.AdminProfile.route
                     }
                 } else {
                     adminMenuItems

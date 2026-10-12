@@ -46,11 +46,28 @@ fun UserHomeScreen(
     viewModel: UserViewModel = hiltViewModel()
 ) {
     val session by viewModel.session.collectAsStateWithLifecycle()
+    val profile by viewModel.profile.collectAsStateWithLifecycle()
     val isOnline by viewModel.isOnline.collectAsStateWithLifecycle()
     val products by viewModel.products.collectAsStateWithLifecycle()
     val announcements by viewModel.announcements.collectAsStateWithLifecycle()
 
-    RequestNotificationPermissionEffect()
+    val userName = session?.name ?: profile?.let { "${it.firstName} ${it.lastName}" } ?: "Valued Customer"
+    val regDate = profile?.dateOfRegistration ?: System.currentTimeMillis()
+
+    val welcomeAnnouncement = remember(userName, regDate) {
+        AnnouncementEntity(
+            id = -1,
+            title = "Welcome, $userName! 🎉",
+            content = "Thank you for joining Mobile Accessories Store. Enjoy exploring our collections!",
+            type = "WELCOME",
+            isActive = true,
+            dateCreated = regDate
+        )
+    }
+
+    val allAnnouncements = remember(announcements, welcomeAnnouncement) {
+        (listOf(welcomeAnnouncement) + announcements).sortedByDescending { it.dateCreated }
+    }
 
     Scaffold(
         topBar = {},
@@ -109,7 +126,8 @@ fun UserHomeScreen(
                             border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Icon(Icons.Default.Search, null, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Search, 
+                                null, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(8.dp))
                             Text("Search products...")
                         }
@@ -117,8 +135,8 @@ fun UserHomeScreen(
                 }
             }
 
-            // ── Announcements Carousel ────────────────────────
-            if (announcements.isNotEmpty()) {
+            // ── Announcements Carousel (Including Welcome) ─────
+            if (allAnnouncements.isNotEmpty()) {
                 item {
                     Column(modifier = Modifier.padding(top = 20.dp)) {
                         SectionHeader(
@@ -126,7 +144,7 @@ fun UserHomeScreen(
                             action = "See All",
                             onAction = { navController.navigate(Screen.Announcements.route) }
                         )
-                        AnnouncementsCarousel(announcements = announcements.take(5))
+                        AnnouncementsCarousel(announcements = allAnnouncements.take(5))
                     }
                 }
             }
@@ -203,7 +221,7 @@ private fun AnnouncementsCarousel(announcements: List<AnnouncementEntity>) {
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Icon(
-                            Icons.Default.Campaign,
+                            if (ann.type == "WELCOME") Icons.Default.Celebration else Icons.Default.Campaign,
                             null,
                             tint = accent,
                             modifier = Modifier.size(18.dp)
@@ -223,7 +241,7 @@ private fun AnnouncementsCarousel(announcements: List<AnnouncementEntity>) {
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        DateUtils.formatDate(ann.dateCreated),
+                        DateUtils.formatDateTime(ann.dateCreated),
                         style = MaterialTheme.typography.labelSmall,
                         color = accent.copy(alpha = 0.6f)
                     )

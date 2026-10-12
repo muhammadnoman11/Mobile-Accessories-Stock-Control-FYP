@@ -22,6 +22,7 @@ import com.fyp.mobileaccessories.stockcontrol.navigation.Screen
 import com.fyp.mobileaccessories.stockcontrol.moderator.navigation.navigateAndClear
 import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTextField
 import com.fyp.mobileaccessories.stockcontrol.ui.component.PrimaryButton
+import com.fyp.mobileaccessories.stockcontrol.ui.component.RequestNotificationPermissionEffect
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
 
 // ============================================================
@@ -35,6 +36,8 @@ fun LoginScreen(
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val state by viewModel.loginState.collectAsStateWithLifecycle()
+
+    RequestNotificationPermissionEffect()
 
     // After successful login, navigate to the correct role dashboard
     fun onLoginSuccess(role: String) {

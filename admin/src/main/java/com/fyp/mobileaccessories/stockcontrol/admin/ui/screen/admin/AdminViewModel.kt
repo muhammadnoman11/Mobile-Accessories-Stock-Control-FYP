@@ -74,22 +74,27 @@ class AdminViewModel @Inject constructor(
     // ──────────────────────────────────────────────────────────
     // DASHBOARD STATS
     // ──────────────────────────────────────────────────────────
-    private val _stats = MutableStateFlow(DashboardStats())
-    val stats: StateFlow<DashboardStats> = _stats.asStateFlow()
+    val stats: StateFlow<DashboardStats> = combine(
+        userRepo.getAllUsers(),
+        productRepo.getAllProducts(),
+        orderRepo.getAllOrders(),
+        transactionRepo.getAllTransactions()
+    ) { users, products, orders, transactions ->
+        DashboardStats(
+            totalUsers = users.count { it.role == "USER" && it.isActive },
+            totalModerators = users.count { it.role == "MODERATOR" && it.isActive },
+            totalProducts = products.count { it.isApproved },
+            pendingProducts = products.count { !it.isApproved },
+            lowStockCount = products.count { it.stockQuantity <= it.lowStockThreshold && it.isApproved },
+            totalOrders = orders.size,
+            pendingOrders = orders.count { it.status == "PENDING" },
+            pendingPayments = transactions.count { it.status == "PENDING" },
+            totalRevenue = orders.filter { it.status == "DELIVERED" }.sumOf { it.totalAmount }
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DashboardStats())
 
     fun loadDashboardStats() {
-        viewModelScope.launch {
-            _stats.value = DashboardStats(
-                totalUsers = userRepo.countUsers(),
-                totalModerators = userRepo.countModerators(),
-                totalProducts = productRepo.countApproved(),
-                pendingProducts = productRepo.countPending(),
-                lowStockCount = productRepo.countLowStock(),
-                pendingOrders = orderRepo.countByStatus("PENDING"),
-                pendingPayments = transactionRepo.countPending(),
-                totalRevenue = orderRepo.getTotalRevenue()
-            )
-        }
+        // Reactive stream automatically handles loading and updates
     }
 
     // ──────────────────────────────────────────────────────────
@@ -204,6 +209,7 @@ class AdminViewModel @Inject constructor(
     }
 
     suspend fun getProductById(id: Int): ProductEntity? = productRepo.getProductById(id)
+    suspend fun getUserById(id: Int): UserEntity? = userRepo.getUserById(id)
 
     // ──────────────────────────────────────────────────────────
     // CATEGORIES

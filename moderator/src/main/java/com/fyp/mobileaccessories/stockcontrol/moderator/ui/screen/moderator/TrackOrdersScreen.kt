@@ -112,6 +112,9 @@ private fun ModOrderCard(
     val product by produceState<com.fyp.mobileaccessories.stockcontrol.data.local.entity.ProductEntity?>(initialValue = null, order.productId) {
         value = viewModel.getProductById(order.productId)
     }
+    val user by produceState<com.fyp.mobileaccessories.stockcontrol.data.local.entity.UserEntity?>(initialValue = null, order.userId) {
+        value = viewModel.getUserById(order.userId)
+    }
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -158,8 +161,19 @@ private fun ModOrderCard(
                 }
             }
             Text(
+                "Customer: ${user?.firstName ?: ""} ${user?.lastName ?: "User #${order.userId}"}",
+                style = MaterialTheme.typography.bodySmall,
+                color = AppColors.TextSecondary
+            )
+
+            Text(
                 "Delivery: ${order.deliveryAddress}",
                 style = MaterialTheme.typography.bodySmall, color = AppColors.TextSecondary
+            )
+            Text(
+                "Contact No: ${user?.contactNo ?: "—"}",
+                style = MaterialTheme.typography.bodySmall,
+                color = AppColors.TextSecondary
             )
             Text(
                 DateUtils.formatDateTime(order.orderDate),

@@ -107,7 +107,8 @@ data class PaymentCompanyEntity(
 // ─────────────────────────────────────────────
 @Entity(
     tableName = "orders",
-    indices = [Index("userId"), Index("productId"), Index("courierId"), Index("paymentCompanyId")]
+    indices = [Index("userId"), Index("productId"),
+        Index("courierId"), Index("paymentCompanyId")]
 )
 data class OrderEntity(
     @PrimaryKey(autoGenerate = true)

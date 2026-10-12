@@ -141,4 +141,26 @@ object NotificationHelper {
             }
         }
     }
+
+    fun sendWelcomeNotification(deviceToken: String) {
+        if (deviceToken.isBlank()) {
+            Log.w(TAG, "Skipped welcome notification; FCM token is blank")
+            return
+        }
+        scope.launch {
+            try {
+                sender.sendToDevice(
+                    deviceToken = deviceToken,
+                    notificationData = NotificationData(
+                        title = "Welcome to Mobile Accessories Store! 🎉",
+                        body = "Thank you for joining us. Browse our latest collection of chargers, earphones, and cases!",
+                        imageUrl = "",
+                        type = NotificationType.NORMAL
+                    )
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed sending welcome notification: ${e.message}")
+            }
+        }
+    }
 }

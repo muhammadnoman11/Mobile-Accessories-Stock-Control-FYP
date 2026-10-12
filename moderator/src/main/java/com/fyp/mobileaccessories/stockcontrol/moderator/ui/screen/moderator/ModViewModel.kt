@@ -5,12 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fyp.mobileaccessories.stockcontrol.data.local.entity.OrderEntity
 import com.fyp.mobileaccessories.stockcontrol.data.local.entity.ProductEntity
+import com.fyp.mobileaccessories.stockcontrol.data.local.entity.UserEntity
 import com.fyp.mobileaccessories.stockcontrol.data.repository.OrderRepository
 import com.fyp.mobileaccessories.stockcontrol.data.repository.ProductRepository
+import com.fyp.mobileaccessories.stockcontrol.data.repository.UserRepository
 import com.fyp.mobileaccessories.stockcontrol.util.ConnectionDetector
 import com.fyp.mobileaccessories.stockcontrol.util.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,6 +28,7 @@ import javax.inject.Inject
 class ModViewModel @Inject constructor(
     private val productRepo: ProductRepository,
     private val orderRepo: OrderRepository,
+    private val userRepo: UserRepository,
     private val sessionManager: SessionManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -37,18 +41,29 @@ class ModViewModel @Inject constructor(
     val session = sessionManager.sessionFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    // ── Dashboard counts ──────────────────────────────────────
-    private val _pendingProductCount = MutableStateFlow(0)
-    val pendingProductCount = _pendingProductCount.asStateFlow()
+    // ── Moderator Profile (Reactive) ──────────────────────────
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val moderatorProfile: StateFlow<UserEntity?> = sessionManager.sessionFlow
+        .flatMapLatest { session ->
+            if (session != null) {
+                userRepo.getAllUsers().map { users -> users.find { it.id == session.userId } }
+            } else {
+                flowOf(null)
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    private val _pendingOrderCount = MutableStateFlow(0)
-    val pendingOrderCount = _pendingOrderCount.asStateFlow()
+    // ── Dashboard counts (Reactive) ───────────────────────────
+    val pendingProductCount: StateFlow<Int> = productRepo.getPendingProducts()
+        .map { it.size }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
+
+    val pendingOrderCount: StateFlow<Int> = orderRepo.getAllOrders()
+        .map { orders -> orders.count { it.status == "PENDING" } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
 
     fun loadDashboardStats() {
-        viewModelScope.launch {
-            _pendingProductCount.value = productRepo.countPending()
-            _pendingOrderCount.value = orderRepo.countByStatus("PENDING")
-        }
+        // Reactive stream automatically handles loading and updates
     }
 
     // ── Products awaiting approval ────────────────────────────
@@ -93,6 +108,7 @@ class ModViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     suspend fun getProductById(id: Int) = productRepo.getProductById(id)
+    suspend fun getUserById(id: Int) = userRepo.getUserById(id)
 
     fun updateOrderStatus(orderId: Int, status: String, onDone: (Boolean, String) -> Unit) {
         viewModelScope.launch {

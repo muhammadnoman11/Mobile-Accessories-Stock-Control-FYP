@@ -33,11 +33,10 @@ fun ModDashboardScreen(
     viewModel: ModViewModel = hiltViewModel()
 ) {
     val session by viewModel.session.collectAsStateWithLifecycle()
+    val modProfile by viewModel.moderatorProfile.collectAsStateWithLifecycle()
     val pendingProds by viewModel.pendingProductCount.collectAsStateWithLifecycle()
     val pendingOrds by viewModel.pendingOrderCount.collectAsStateWithLifecycle()
     val isOnline by viewModel.isOnline.collectAsStateWithLifecycle()
-
-    RequestNotificationPermissionEffect()
 
     LaunchedEffect(Unit) { viewModel.loadDashboardStats() }
 
@@ -70,12 +69,12 @@ fun ModDashboardScreen(
                         fontWeight = FontWeight.SemiBold, color = Color.White.copy(alpha = 0.8f)
                     )
                     Text(
-                        "Welcome, ${session?.name ?: "Moderator"} 👋",
+                        "Welcome, ${modProfile?.firstName ?: session?.name ?: "Moderator"} 👋",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold, color = Color.White
                     )
                     Text(
-                        "Domain: ${session?.name ?: "—"}",
+                        "Domain: ${modProfile?.domain ?: "—"}",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(alpha = 0.7f)
                     )

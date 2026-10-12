@@ -6,6 +6,7 @@ package com.fyp.mobileaccessories.stockcontrol.ui.screen.auth
 // Used by SplashScreen, LoginScreen, and RegisterScreen.
 // ============================================================
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fyp.mobileaccessories.stockcontrol.data.local.entity.UserEntity
@@ -15,6 +16,7 @@ import com.fyp.mobileaccessories.stockcontrol.util.PasswordHasher
 import com.fyp.mobileaccessories.stockcontrol.util.SessionData
 import com.fyp.mobileaccessories.stockcontrol.util.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -50,7 +52,8 @@ data class RegisterUiState(
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     // ── Session flow — null means not logged in ───────────────
@@ -191,6 +194,18 @@ class AuthViewModel @Inject constructor(
                 plainPassword = s.password
             )
             if (result.isSuccess) {
+                val userId = result.getOrNull()?.toInt() ?: 0
+                val newUser = userRepository.getUserById(userId)
+                if (newUser != null) {
+                    sessionManager.saveSession(
+                        userId = newUser.id,
+                        role = newUser.role,
+                        name = "${newUser.firstName} ${newUser.lastName}",
+                        email = newUser.email
+                    )
+                    persistUserFcmToken(newUser.id)
+                }
+
                 _registerState.update { it.copy(isLoading = false, isSuccess = true) }
                 onSuccess()
             } else {

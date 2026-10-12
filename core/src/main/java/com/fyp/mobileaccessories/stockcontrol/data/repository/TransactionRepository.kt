@@ -52,9 +52,9 @@ class TransactionRepository @Inject constructor(
 
                 val title = "Order Status Update"
                 val body = if (product != null) {
-                    "Your Order #${order.id} (${product.name}) status is now CONFIRMED"
+                    "Your Order #${order.id} (${product.name}) is now CONFIRMED"
                 } else {
-                    "Your Order #${order.id} status is now CONFIRMED"
+                    "Your Order #${order.id} is now CONFIRMED"
                 }
                 NotificationHelper.sendNotificationToUserDevice(fcmToken, title, body, product?.imageUrl ?: "")
             } else if (status == "REJECTED") {
@@ -69,9 +69,9 @@ class TransactionRepository @Inject constructor(
 
                 val title = "Order Status Update"
                 val body = if (product != null) {
-                    "Your Order #${order.id} (${product.name}) status is now CANCELLED (Payment Rejected)"
+                    "Your Order #${order.id} (${product.name}) is now CANCELLED (Payment Rejected)"
                 } else {
-                    "Your Order #${order.id} status is now CANCELLED"
+                    "Your Order #${order.id} is now CANCELLED"
                 }
                 NotificationHelper.sendNotificationToUserDevice(fcmToken, title, body, product?.imageUrl ?: "")
             }
