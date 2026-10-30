@@ -65,7 +65,8 @@ class ProductRepository @Inject constructor(
 
     suspend fun setApprovalStatus(productId: Int, approved: Boolean) {
         ensureOnline(if (approved) "approve product" else "reject product")
-        productDao.setApprovalStatus(productId, approved)
+        val status = if (approved) "APPROVED" else "REJECTED"
+        productDao.setApprovalStatus(productId, approved, status)
         remoteSyncManager.updateProductApproval(productId, approved)
 
         val product = productDao.getProductById(productId)

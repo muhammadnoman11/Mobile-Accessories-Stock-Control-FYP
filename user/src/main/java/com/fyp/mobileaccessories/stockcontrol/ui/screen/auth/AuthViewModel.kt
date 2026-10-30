@@ -224,6 +224,8 @@ class AuthViewModel @Inject constructor(
         userRepository.updateFcmToken(userId, token)
     }
 
+    suspend fun checkUserExists(userId: Int): UserEntity? = userRepository.getUserById(userId)
+
     // ── LOGOUT ────────────────────────────────────────────────
     fun logout(onLogout: () -> Unit) {
         viewModelScope.launch {

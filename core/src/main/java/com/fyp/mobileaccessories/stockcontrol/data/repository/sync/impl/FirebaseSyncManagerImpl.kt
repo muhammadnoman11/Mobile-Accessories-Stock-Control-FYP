@@ -1,12 +1,15 @@
 package com.fyp.mobileaccessories.stockcontrol.data.repository.sync.impl
 
+import android.content.Context
 import android.util.Log
 import com.fyp.mobileaccessories.stockcontrol.data.local.dao.*
 import com.fyp.mobileaccessories.stockcontrol.data.local.entity.*
 import com.fyp.mobileaccessories.stockcontrol.data.repository.RemoteSyncManager
 import com.fyp.mobileaccessories.stockcontrol.data.repository.sync.*
 import com.fyp.mobileaccessories.stockcontrol.util.Constant
+import com.fyp.mobileaccessories.stockcontrol.util.SessionManager
 import com.google.firebase.database.*
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -22,7 +25,9 @@ class FirebaseSyncManagerImpl @Inject constructor(
     private val announcementDao: AnnouncementDao,
     private val courierDao: CourierDao,
     private val paymentCompanyDao: PaymentCompanyDao,
-    private val categoryDao: CategoryDao
+    private val categoryDao: CategoryDao,
+    private val sessionManager: SessionManager,
+    @ApplicationContext private val context: Context
 ) : RemoteSyncManager {
     private val TAG = "FirebaseSync"
     private var dbRef: DatabaseReference? = null
@@ -30,7 +35,7 @@ class FirebaseSyncManagerImpl @Inject constructor(
 
     private val productSync = ProductSyncHandler(productDao, scope)
     private val orderSync = OrderSyncHandler(orderDao, scope)
-    private val userSync = UserSyncHandler(userDao, scope)
+    private val userSync = UserSyncHandler(userDao, scope, context, sessionManager)
     private val announcementSync = AnnouncementSyncHandler(announcementDao, scope)
     private val supportSync =
         SupportSyncHandler(transactionDao, courierDao, paymentCompanyDao, scope)
@@ -120,9 +125,9 @@ class FirebaseSyncManagerImpl @Inject constructor(
             }
         })
 
-        ref.child("users").addValueEventListener(object : ValueEventListener {
+        ref.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                userSync.handleSync(snapshot)
+                userSync.handleSync(snapshot.child("users"))
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -189,8 +194,12 @@ class FirebaseSyncManagerImpl @Inject constructor(
         dbRef?.child("payment_companies")?.child(companyId.toString())?.removeValue()
     }
 
-    override suspend fun deleteUser(userId: Int) {
-        dbRef?.child("users")?.child(userId.toString())?.removeValue()
+    override suspend fun deleteUser(userId: Int, uid: String) {
+        val ref = dbRef ?: return
+        if (uid.isNotBlank()) {
+            ref.child("users").child(uid).removeValue()
+        }
+        ref.child("users").child(userId.toString()).removeValue()
     }
 
     override suspend fun updateOrderStatus(orderId: Int, status: String) {
@@ -226,11 +235,16 @@ class FirebaseSyncManagerImpl @Inject constructor(
     }
 
     override suspend fun updateUserFcmToken(userId: Int, token: String) {
-        dbRef?.child("users")?.child(userId.toString())?.child("fcmToken")?.setValue(token)?.await()
+        val user = userDao.getUserById(userId)
+        val ref = dbRef ?: return
+        val key = if (user != null && user.uid.isNotBlank()) user.uid else userId.toString()
+        ref.child("users").child(key).child("fcmToken").setValue(token).await()
     }
 
     override suspend fun fetchUserFcmToken(userId: Int): String {
-        val snapshot = dbRef?.child("users")?.child(userId.toString())?.child("fcmToken")?.get()?.await()
+        val user = userDao.getUserById(userId)
+        val key = if (user != null && user.uid.isNotBlank()) user.uid else userId.toString()
+        val snapshot = dbRef?.child("users")?.child(key)?.child("fcmToken")?.get()?.await()
         return snapshot?.getValue(String::class.java).orEmpty()
     }
 }

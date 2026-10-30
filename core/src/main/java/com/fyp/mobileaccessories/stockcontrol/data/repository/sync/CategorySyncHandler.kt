@@ -17,7 +17,7 @@ class CategorySyncHandler(
     fun handleSync(snapshot: DataSnapshot) {
         scope.launch {
             val cloudIds = mutableSetOf<Int>()
-            if (snapshot.exists() && snapshot.hasChildren()) {
+            if (snapshot.exists()) {
                 for (child in snapshot.children) {
                     try {
                         val id = child.child("id").getValue(Int::class.java)
@@ -34,11 +34,16 @@ class CategorySyncHandler(
                     }
                 }
             }
-            val localCategories = categoryDao.getAllCategoriesList()
-            for (local in localCategories) {
-                if (local.id !in cloudIds && cloudIds.isNotEmpty()) {
-                    categoryDao.deleteCategory(local)
+            try {
+                val localCategories = categoryDao.getAllCategoriesList()
+                for (local in localCategories) {
+                    if (local.id !in cloudIds) {
+                        categoryDao.deleteCategory(local)
+                        Log.d(TAG, "Deleted local category ${local.name} as it was removed from Realtime Database.")
+                    }
                 }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error syncing category deletions: ${e.message}")
             }
         }
     }

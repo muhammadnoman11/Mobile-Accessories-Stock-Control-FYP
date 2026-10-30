@@ -1,17 +1,19 @@
 package com.fyp.mobileaccessories.stockcontrol.moderator.ui.screen.moderator
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,12 +21,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.fyp.mobileaccessories.stockcontrol.navigation.Screen
 import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTopBar
+import com.fyp.mobileaccessories.stockcontrol.ui.component.ProfileInfoRow
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
 import com.fyp.mobileaccessories.stockcontrol.util.DateUtils
-
-// ============================================================
-// ModProfileScreen
-// ============================================================
 
 @Composable
 fun ModProfileScreen(
@@ -91,18 +90,18 @@ fun ModProfileScreen(
             Spacer(Modifier.height(8.dp))
             HorizontalDivider(color = AppColors.Divider)
 
-            // Profile details
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                ProfileInfoRow(Icons.Default.Phone, "Contact No", modProfile?.contactNo ?: "—")
-                ProfileInfoRow(Icons.Default.LocationOn, "Address", modProfile?.address ?: "—")
-                ProfileInfoRow(Icons.Default.Category, "Product Domain", modProfile?.domain ?: "—")
-                ProfileInfoRow(Icons.Default.Male, "Gender", modProfile?.gender ?: "—")
+                ProfileInfoRow(Icons.Default.Phone, "Contact No", modProfile?.contactNo ?: "—", iconTint = Color(0xFFD97706))
+                ProfileInfoRow(Icons.Default.LocationOn, "Address", modProfile?.address ?: "—", iconTint = Color(0xFFD97706))
+                ProfileInfoRow(Icons.Default.Category, "Product Domain", modProfile?.domain ?: "—", iconTint = Color(0xFFD97706))
+                ProfileInfoRow(Icons.Default.Male, "Gender", modProfile?.gender ?: "—", iconTint = Color(0xFFD97706))
                 ProfileInfoRow(
                     Icons.Default.CalendarToday, "Member Since",
-                    DateUtils.formatDate(modProfile?.dateOfRegistration ?: System.currentTimeMillis())
+                    DateUtils.formatDate(modProfile?.dateOfRegistration ?: System.currentTimeMillis()),
+                    iconTint = Color(0xFFD97706)
                 )
             }
 
@@ -122,30 +121,6 @@ fun ModProfileScreen(
                 Spacer(Modifier.width(8.dp))
                 Text("Sign Out")
             }
-        }
-    }
-}
-
-@Composable
-private fun ProfileInfoRow(
-    icon: ImageVector,
-    label: String, value: String
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.Top
-    ) {
-        Icon(icon, null, tint = Color(0xFFD97706), modifier = Modifier
-            .size(18.dp)
-            .offset(y = 2.dp))
-        Column {
-            Text(
-                label,
-                style = MaterialTheme.typography.labelSmall,
-                color = AppColors.TextSecondary
-            )
-            Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
         }
     }
 }

@@ -22,7 +22,7 @@ interface RemoteSyncManager {
     suspend fun deleteAnnouncement(announcementId: Int)
     suspend fun deleteCourier(courierId: Int)
     suspend fun deletePaymentCompany(companyId: Int)
-    suspend fun deleteUser(userId: Int)
+    suspend fun deleteUser(userId: Int, uid: String = "")
     suspend fun deleteCategory(categoryId: Int)
 
     // Status update operations

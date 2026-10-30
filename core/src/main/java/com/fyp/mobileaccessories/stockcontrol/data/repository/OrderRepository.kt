@@ -43,15 +43,22 @@ class OrderRepository @Inject constructor(
         orderDao.updateOrderStatus(orderId, status)
         remoteSyncManager.updateOrderStatus(orderId, status)
 
-        // Automatically sync corresponding pending transaction status
+        // Automatically sync corresponding transaction status
         val tx = transactionDao.getTransactionByOrderId(orderId)
-        if (tx != null && tx.status == "PENDING") {
-            if (status in listOf("CONFIRMED", "DISPATCHED", "DELIVERED")) {
+        val orderEntity = orderDao.getOrderById(orderId)
+        if (tx != null) {
+            if (status in listOf("CONFIRMED", "DISPATCHED", "DELIVERED") && tx.status == "PENDING") {
                 transactionDao.updateTransactionStatus(tx.id, "APPROVED", "Auto-approved via order status ($status)")
                 remoteSyncManager.updateTransactionStatus(tx.id, "APPROVED", "Auto-approved via order status ($status)")
             } else if (status == "CANCELLED") {
-                transactionDao.updateTransactionStatus(tx.id, "REJECTED", "Auto-rejected via order status ($status)")
-                remoteSyncManager.updateTransactionStatus(tx.id, "REJECTED", "Auto-rejected via order status ($status)")
+                val isCod = orderEntity?.paymentMode.orEmpty().contains("CASH", ignoreCase = true) ||
+                            orderEntity?.paymentMode.orEmpty().contains("COD", ignoreCase = true)
+
+                val newTxStatus = if (isCod) "CANCELLED" else "REFUND_PENDING"
+                val remarks = if (isCod) "COD Order Cancelled - No payment collected" else "Prepaid Order Cancelled - Refund Pending"
+
+                transactionDao.updateTransactionStatus(tx.id, newTxStatus, remarks)
+                remoteSyncManager.updateTransactionStatus(tx.id, newTxStatus, remarks)
             }
         }
 

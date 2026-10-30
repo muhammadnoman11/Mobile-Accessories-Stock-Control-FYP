@@ -21,13 +21,6 @@ import com.fyp.mobileaccessories.stockcontrol.ui.component.DropdownField
 import com.fyp.mobileaccessories.stockcontrol.ui.component.PrimaryButton
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
 
-// ============================================================
-// FILE: presentation/auth/RegisterScreen.kt
-// User self-registration form — firstName, lastName, gender,
-// address, contactNo, email, password, confirmPassword.
-// Self-registration always creates USER role.
-// ============================================================
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
@@ -36,7 +29,6 @@ fun RegisterScreen(
 ) {
     val state by viewModel.registerState.collectAsStateWithLifecycle()
 
-    // After success, go to login so they sign in with new account
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) navController.navigateUp()
     }
@@ -44,7 +36,7 @@ fun RegisterScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Create Account", fontWeight = FontWeight.Bold) },
+                title = { Text("Register Moderator", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -73,32 +65,40 @@ fun RegisterScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Header text
             Column {
-                Text("Join StockControl",
+                Text(
+                    "Moderator Registration",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = AppColors.OnBackground)
-                Text("Fill in your details to create an account",
+                    color = AppColors.OnBackground
+                )
+                Text(
+                    "Fill in your profile and product domain details",
                     style = MaterialTheme.typography.bodySmall,
-                    color = AppColors.TextSecondary)
+                    color = AppColors.TextSecondary
+                )
             }
 
-            // Error Banner
             if (state.error != null) {
                 Surface(
                     color = AppColors.ErrorContainer,
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(Icons.Default.Error, null, tint = AppColors.Error,
-                            modifier = Modifier.size(16.dp))
-                        Text(state.error!!, style = MaterialTheme.typography.bodySmall,
-                            color = AppColors.Error)
+                        Icon(
+                            Icons.Default.Error, null, tint = AppColors.Error,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            state.error!!, style = MaterialTheme.typography.bodySmall,
+                            color = AppColors.Error
+                        )
                     }
                 }
             }
@@ -113,7 +113,6 @@ fun RegisterScreen(
                     value = state.firstName,
                     onValueChange = viewModel::onRegFirstName,
                     label = "First Name",
-                    leadingIcon = Icons.Default.Person,
                     modifier = Modifier.weight(1f)
                 )
                 AppTextField(
@@ -124,12 +123,20 @@ fun RegisterScreen(
                 )
             }
 
-            // Gender dropdown
             DropdownField(
                 label = "Gender",
                 selectedValue = state.gender,
                 options = listOf("Male", "Female", "Other"),
                 onSelect = viewModel::onRegGender
+            )
+
+            // Product Domain input field (like in Admin module)
+            AppTextField(
+                value = state.domain,
+                onValueChange = viewModel::onRegDomain,
+                label = "Product Domain",
+                placeholder = "e.g. Mobile Accessories, Chargers, Cases",
+                leadingIcon = Icons.Default.Category
             )
 
             // ── Section: Contact Info ─────────────────────────
@@ -174,41 +181,47 @@ fun RegisterScreen(
                 isPassword = true
             )
 
-            // Role notice
             Surface(
                 color = AppColors.InfoContainer,
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.Info, null, tint = AppColors.Info,
-                        modifier = Modifier.size(16.dp))
-                    Text("Your account will be registered as a Customer (USER) role.",
+                    Icon(
+                        Icons.Default.Info, null, tint = AppColors.Info,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Text(
+                        "Your account will be registered with MODERATOR role and product domain.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.Info)
+                        color = AppColors.Info
+                    )
                 }
             }
 
             Spacer(Modifier.height(8.dp))
             PrimaryButton(
-                text = "Create Account",
+                text = "Register Moderator",
                 onClick = { viewModel.register { navController.navigateUp() } },
                 isLoading = state.isLoading,
                 icon = Icons.Default.PersonAdd
             )
 
-            // Back to login link
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Already have an account? ",
+                Text(
+                    "Already have an account? ",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.TextSecondary)
+                    color = AppColors.TextSecondary
+                )
                 TextButton(onClick = { navController.navigateUp() }) {
                     Text("Sign In", fontWeight = FontWeight.Bold, color = AppColors.Primary)
                 }
@@ -218,7 +231,6 @@ fun RegisterScreen(
     }
 }
 
-// Small helper composable for section labels in the form
 @Composable
 private fun SectionLabel(text: String) {
     Text(

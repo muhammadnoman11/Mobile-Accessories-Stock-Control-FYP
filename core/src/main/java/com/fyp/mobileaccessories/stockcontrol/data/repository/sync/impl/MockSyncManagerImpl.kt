@@ -66,8 +66,8 @@ class MockSyncManagerImpl @Inject constructor() : RemoteSyncManager {
         Log.d(TAG, "Deleting payment company #$companyId in cloud mock database")
     }
 
-    override suspend fun deleteUser(userId: Int) {
-        Log.d(TAG, "Deleting user #$userId in cloud mock database")
+    override suspend fun deleteUser(userId: Int, uid: String) {
+        Log.d(TAG, "Deleting user #$userId (uid: $uid) in cloud mock database")
     }
 
     override suspend fun deleteCategory(categoryId: Int) {

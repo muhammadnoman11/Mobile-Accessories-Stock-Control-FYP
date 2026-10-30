@@ -22,9 +22,11 @@ class SupportSyncHandler(
 
     fun handleTransactionSync(snapshot: DataSnapshot) {
         scope.launch {
+            val cloudIds = mutableSetOf<Int>()
             for (child in snapshot.children) {
                 try {
                     val id = child.child("id").getValue(Int::class.java) ?: continue
+                    cloudIds.add(id)
                     val orderId = child.child("orderId").getValue(Int::class.java) ?: continue
                     val userId = child.child("userId").getValue(Int::class.java) ?: continue
                     val paymentCompanyId = child.child("paymentCompanyId").getValue(Int::class.java)
@@ -45,14 +47,27 @@ class SupportSyncHandler(
                     Log.e(TAG, "Error parsing transaction: ${e.message}")
                 }
             }
+            try {
+                val localTransactions = transactionDao.getAllTransactionsList()
+                for (local in localTransactions) {
+                    if (local.id !in cloudIds) {
+                        transactionDao.deleteTransaction(local)
+                        Log.d(TAG, "Deleted local transaction TXN #${local.id} as it was removed from Realtime Database.")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error syncing transaction deletions: ${e.message}")
+            }
         }
     }
 
     fun handleCourierSync(snapshot: DataSnapshot) {
         scope.launch {
+            val cloudIds = mutableSetOf<Int>()
             for (child in snapshot.children) {
                 try {
                     val id = child.child("id").getValue(Int::class.java) ?: continue
+                    cloudIds.add(id)
                     val name = child.child("name").getValue(String::class.java) ?: ""
                     val contactNo = child.child("contactNo").getValue(String::class.java) ?: ""
                     val email = child.child("email").getValue(String::class.java) ?: ""
@@ -70,14 +85,27 @@ class SupportSyncHandler(
                     Log.e(TAG, "Error parsing courier: ${e.message}")
                 }
             }
+            try {
+                val localCouriers = courierDao.getAllCouriersList()
+                for (local in localCouriers) {
+                    if (local.id !in cloudIds) {
+                        courierDao.deleteCourier(local)
+                        Log.d(TAG, "Deleted local courier ${local.name} as it was removed from Realtime Database.")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error syncing courier deletions: ${e.message}")
+            }
         }
     }
 
     fun handlePaymentCompanySync(snapshot: DataSnapshot) {
         scope.launch {
+            val cloudIds = mutableSetOf<Int>()
             for (child in snapshot.children) {
                 try {
                     val id = child.child("id").getValue(Int::class.java) ?: continue
+                    cloudIds.add(id)
                     val name = child.child("name").getValue(String::class.java) ?: ""
                     val type = child.child("type").getValue(String::class.java) ?: "PAYMENT_RECEIVER"
                     val accountNo = child.child("accountNo").getValue(String::class.java) ?: ""
@@ -91,6 +119,17 @@ class SupportSyncHandler(
                 } catch (e: Exception) {
                     Log.e(TAG, "Error parsing payment company: ${e.message}")
                 }
+            }
+            try {
+                val localCompanies = paymentCompanyDao.getAllPaymentCompaniesList()
+                for (local in localCompanies) {
+                    if (local.id !in cloudIds) {
+                        paymentCompanyDao.deletePaymentCompany(local)
+                        Log.d(TAG, "Deleted local payment company ${local.name} as it was removed from Realtime Database.")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error syncing payment company deletions: ${e.message}")
             }
         }
     }

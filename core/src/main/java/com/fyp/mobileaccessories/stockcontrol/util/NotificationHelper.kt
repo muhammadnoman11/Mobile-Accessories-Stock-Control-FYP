@@ -6,37 +6,38 @@ import com.github.muhammadnoman11.easyfirebasenotifier.data.NotificationType
 import com.github.muhammadnoman11.easyfirebasenotifier.network.EasyNotificationSender
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-
-object NotificationTopics {
-    const val USER_NOTIFICATIONS = "user_notifications"
-    const val ADMIN_NOTIFICATIONS = "admin_notifications"
-    const val MODERATOR_NOTIFICATIONS = "moderator_notifications"
-}
 
 object NotificationHelper {
     private const val TAG = "NotificationHelper"
-    private val sender by lazy { EasyNotificationSender() }
-    private val scope = CoroutineScope(Dispatchers.IO)
+    private val sender = EasyNotificationSender()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    fun sendAnnouncementNotification(
-        title: String,
-        body: String,
-        imageUrl: String? = null
+    fun sendOrderStatusNotification(
+        orderId: Int,
+        status: String,
+        productName: String = "",
+        imageUrl: String = ""
     ) {
         scope.launch {
             try {
-                sender.sendToTopic(
-                    topic = NotificationTopics.USER_NOTIFICATIONS,
-                    notificationData = NotificationData(
-                        title = title,
-                        body = body,
-                        imageUrl = imageUrl ?: "",
-                        type = NotificationType.NORMAL
-                    )
+                val title = "Order Status Update"
+                val body = if (productName.isNotBlank()) {
+                    "Your Order #$orderId ($productName) is now $status"
+                } else {
+                    "Your Order #$orderId is now $status"
+                }
+                val data = NotificationData(
+                    title = title,
+                    body = body,
+                    imageUrl = imageUrl,
+                    type = NotificationType.NORMAL
                 )
+                sender.sendToTopic(NotificationTopics.ADMIN_NOTIFICATIONS, data)
+                sender.sendToTopic(NotificationTopics.MODERATOR_NOTIFICATIONS, data)
             } catch (e: Exception) {
-                Log.e(TAG, "Failed sending announcement notification: ${e.message}")
+                Log.e(TAG, "Failed sending order status notification: ${e.message}")
             }
         }
     }
@@ -107,10 +108,33 @@ object NotificationHelper {
                     imageUrl = imageUrl,
                     type = NotificationType.NORMAL
                 )
+                // Rejection notifications go ONLY to Admin. Approvals go to both.
                 sender.sendToTopic(NotificationTopics.ADMIN_NOTIFICATIONS, data)
-                sender.sendToTopic(NotificationTopics.MODERATOR_NOTIFICATIONS, data)
+                if (isApproved) {
+                    sender.sendToTopic(NotificationTopics.MODERATOR_NOTIFICATIONS, data)
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed sending product approval notification: ${e.message}")
+            }
+        }
+    }
+
+    fun sendAnnouncementNotification(
+        title: String,
+        body: String
+    ) {
+        scope.launch {
+            try {
+                val data = NotificationData(
+                    title = title,
+                    body = body,
+                    type = NotificationType.NORMAL
+                )
+                sender.sendToTopic(NotificationTopics.USER_NOTIFICATIONS, data)
+                sender.sendToTopic(NotificationTopics.MODERATOR_NOTIFICATIONS, data)
+                sender.sendToTopic(NotificationTopics.ADMIN_NOTIFICATIONS, data)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed sending announcement notification: ${e.message}")
             }
         }
     }
@@ -137,29 +161,7 @@ object NotificationHelper {
                     )
                 )
             } catch (e: Exception) {
-                Log.e(TAG, "Failed sending notification to device: ${e.message}")
-            }
-        }
-    }
-
-    fun sendWelcomeNotification(deviceToken: String) {
-        if (deviceToken.isBlank()) {
-            Log.w(TAG, "Skipped welcome notification; FCM token is blank")
-            return
-        }
-        scope.launch {
-            try {
-                sender.sendToDevice(
-                    deviceToken = deviceToken,
-                    notificationData = NotificationData(
-                        title = "Welcome to Mobile Accessories Store! 🎉",
-                        body = "Thank you for joining us. Browse our latest collection of chargers, earphones, and cases!",
-                        imageUrl = "",
-                        type = NotificationType.NORMAL
-                    )
-                )
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed sending welcome notification: ${e.message}")
+                Log.e(TAG, "Failed sending device notification: ${e.message}")
             }
         }
     }

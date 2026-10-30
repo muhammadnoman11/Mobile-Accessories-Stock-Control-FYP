@@ -59,7 +59,7 @@ class ModViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
 
     val pendingOrderCount: StateFlow<Int> = orderRepo.getAllOrders()
-        .map { orders -> orders.count { it.status == "PENDING" } }
+        .map { orders -> orders.count { it.status !in listOf("DELIVERED", "CANCELLED") } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
 
     fun loadDashboardStats() {
@@ -94,8 +94,7 @@ class ModViewModel @Inject constructor(
                 return@launch
             }
             try {
-                val product = productRepo.getProductById(productId)
-                product?.let { productRepo.deleteProduct(it) }
+                productRepo.setApprovalStatus(productId, false)
                 onDone(true, "Product rejected")
             } catch (e: Exception) {
                 onDone(false, e.message ?: "Error")

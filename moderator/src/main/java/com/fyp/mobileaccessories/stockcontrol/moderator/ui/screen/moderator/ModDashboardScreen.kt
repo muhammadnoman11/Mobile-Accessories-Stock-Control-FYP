@@ -2,30 +2,23 @@ package com.fyp.mobileaccessories.stockcontrol.moderator.ui.screen.moderator
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.fyp.mobileaccessories.stockcontrol.moderator.ui.screen.moderator.component.ModActionCard
 import com.fyp.mobileaccessories.stockcontrol.navigation.Screen
 import com.fyp.mobileaccessories.stockcontrol.ui.component.OfflineBanner
-import com.fyp.mobileaccessories.stockcontrol.ui.component.RequestNotificationPermissionEffect
 import com.fyp.mobileaccessories.stockcontrol.ui.component.StatCard
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-
-// ============================================================
-// FILE: presentation/moderator/ModDashboardScreen.kt
-// ============================================================
 
 @Composable
 fun ModDashboardScreen(
@@ -50,7 +43,6 @@ fun ModDashboardScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             OfflineBanner(isOffline = !isOnline)
-            // Gradient header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -123,7 +115,6 @@ fun ModDashboardScreen(
             )
             Spacer(Modifier.height(12.dp))
 
-            // Action cards
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -151,43 +142,6 @@ fun ModDashboardScreen(
                 )
             }
             Spacer(Modifier.height(24.dp))
-        }
-    }
-}
-
-@Composable
-private fun ModActionCard(
-    title: String, subtitle: String,
-    icon: ImageVector,
-    color: Color, onClick: () -> Unit
-) {
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(52.dp)
-                    .background(color.copy(alpha = 0.1f), RoundedCornerShape(14.dp)),
-                contentAlignment = Alignment.Center
-            ) { Icon(icon, null, tint = color, modifier = Modifier.size(28.dp)) }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(title, fontWeight = FontWeight.Bold)
-                Text(
-                    subtitle, style = MaterialTheme.typography.bodySmall,
-                    color = AppColors.TextSecondary
-                )
-            }
-            Icon(Icons.Default.ChevronRight, null, tint = AppColors.TextTertiary)
         }
     }
 }

@@ -10,8 +10,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -19,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.fyp.mobileaccessories.stockcontrol.admin.R
 import com.fyp.mobileaccessories.stockcontrol.navigation.Screen
 import com.fyp.mobileaccessories.stockcontrol.admin.navigation.navigateAndClear
 import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTextField
@@ -67,27 +70,26 @@ fun LoginScreen(
         ) {
             Spacer(Modifier.height(48.dp))
 
-            // App Icon
+
             Box(
                 modifier = Modifier
-                    .size(80.dp)
-                    .background(Color.White.copy(alpha = 0.2f), CircleShape),
+                    .size(100.dp)
+                    .background(Color.White.copy(alpha = 0.8f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    Icons.Default.Inventory2, contentDescription = null,
-                    tint = Color.White, modifier = Modifier.size(44.dp)
+                Image(
+                    painter = painterResource(R.drawable.admin_icon),
+                    contentDescription = "",
+                    modifier = Modifier.size(80.dp)
                 )
             }
             Spacer(Modifier.height(12.dp))
+
             Text(
-                "StockControl", style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold, color = Color.White
-            )
-            Text(
-                "Admin Control Panel", style = MaterialTheme.typography.bodyMedium,
+                "Admin Stock Control Panel", style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold, color = Color.White
             )
+            Spacer(Modifier.height(4.dp))
             Text(
                 "Sign in to manage stock and operations", style = MaterialTheme.typography.bodySmall,
                 color = Color.White.copy(alpha = 0.8f)
@@ -95,7 +97,7 @@ fun LoginScreen(
 
             Spacer(Modifier.height(40.dp))
 
-            // ── Login Card ────────────────────────────────────
+            // Login Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -175,30 +177,6 @@ fun LoginScreen(
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
-
-            // Default credential hint
-            Spacer(Modifier.height(8.dp))
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = AppColors.InfoContainer)
-            ) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Text(
-                        "Demo Credentials",
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold, color = AppColors.Info
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        "Admin: admin@stock.com / Admin@123",
-                        style = MaterialTheme.typography.bodySmall, color = AppColors.Info
-                    )
-                }
-            }
             Spacer(Modifier.height(24.dp))
         }
     }

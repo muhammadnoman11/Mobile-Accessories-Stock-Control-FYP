@@ -1,10 +1,5 @@
 package com.fyp.mobileaccessories.stockcontrol.ui.screen.auth
 
-// ============================================================
-// FILE: presentation/auth/LoginScreen.kt
-// Login screen — email + password, role-based navigation on success
-// ============================================================
-
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -17,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -30,8 +26,7 @@ import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTextField
 import com.fyp.mobileaccessories.stockcontrol.ui.component.PrimaryButton
 import com.fyp.mobileaccessories.stockcontrol.ui.component.RequestNotificationPermissionEffect
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-import com.fyp.mobileaccessories.stockcontrol.util.UserRole
-
+import com.fyp.mobileaccessories.stockcontrol.R
 
 @Composable
 fun LoginScreen(
@@ -71,24 +66,23 @@ fun LoginScreen(
             // App Icon
             Box(
                 modifier = Modifier
-                    .size(80.dp)
-                    .background(Color.White.copy(alpha = 0.2f), CircleShape),
+                    .size(100.dp)
+                    .background(Color.White.copy(alpha = 0.8f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    Icons.Default.Inventory2, contentDescription = null,
-                    tint = Color.White, modifier = Modifier.size(44.dp)
+                Image(
+                    painter = painterResource(R.drawable.user_icon),
+                    contentDescription = "",
+                    modifier = Modifier.size(80.dp)
                 )
             }
             Spacer(Modifier.height(12.dp))
-            Text(
-                "StockControl", style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold, color = Color.White
-            )
+
             Text(
                 "Customer Store", style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold, color = Color.White
             )
+            Spacer(Modifier.height(4.dp))
             Text(
                 "Sign in to browse accessories and place orders", style = MaterialTheme.typography.bodySmall,
                 color = Color.White.copy(alpha = 0.8f)
@@ -196,28 +190,6 @@ fun LoginScreen(
                 }
             }
 
-            // Default credential hint
-            Spacer(Modifier.height(8.dp))
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = AppColors.InfoContainer)
-            ) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Text(
-                        "Demo Credentials",
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold, color = AppColors.Info
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        "User: user@stock.com / User@123",
-                        style = MaterialTheme.typography.bodySmall, color = AppColors.Info
-                    )
-                }
-            }
             Spacer(Modifier.height(24.dp))
         }
     }

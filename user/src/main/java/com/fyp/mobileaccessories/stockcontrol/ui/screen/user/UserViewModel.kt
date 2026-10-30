@@ -68,6 +68,18 @@ class UserViewModel @Inject constructor(
     val session = sessionManager.sessionFlow
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
+    // ── User Profile (Reactive) ──────────────────────────────
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val userProfile: StateFlow<UserEntity?> = sessionManager.sessionFlow
+        .flatMapLatest { session ->
+            if (session != null) {
+                userRepo.getAllUsers().map { users -> users.find { it.id == session.userId } }
+            } else {
+                flowOf(null)
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     // ──────────────────────────────────────────────────────────
     // PRODUCTS — search + category filter (only approved)
     // ──────────────────────────────────────────────────────────

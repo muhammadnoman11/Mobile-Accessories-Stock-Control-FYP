@@ -6,10 +6,10 @@ import com.fyp.mobileaccessories.stockcontrol.data.local.entity.UserEntity
 import com.fyp.mobileaccessories.stockcontrol.util.ConnectionDetector
 import com.fyp.mobileaccessories.stockcontrol.util.Constant
 import com.fyp.mobileaccessories.stockcontrol.util.PasswordHasher
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,7 +19,6 @@ class UserRepository @Inject constructor(
     private val remoteSyncManager: RemoteSyncManager,
     @ApplicationContext private val context: Context
 ) {
-    private val firebaseAuth: FirebaseAuth get() = FirebaseAuth.getInstance()
 
     private fun ensureOnline(actionName: String = "Action") {
         if (!ConnectionDetector.isConnected(context)) {
@@ -28,54 +27,42 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun login(email: String, plainPassword: String): UserEntity? {
-        ensureOnline("log in to account")
-        val authResult = firebaseAuth.signInWithEmailAndPassword(email, plainPassword).await()
-        val uid = authResult.user?.uid ?: ""
-
         val hashed = PasswordHasher.hash(plainPassword)
-        var user = userDao.login(email, hashed)
 
-        if (user == null) {
-            val existingUser = userDao.getUserByEmail(email)
-            if (existingUser != null) {
-                user = existingUser.copy(passwordHash = hashed, uid = uid)
-                userDao.updateUser(user)
-            } else {
-                // Fetch real profile created by Admin or stored in Firebase Realtime DB
-                val cloudUser = fetchUserFromFirebase(email, uid)
-                if (cloudUser != null) {
-                    val userToInsert = cloudUser.copy(id = 0, passwordHash = hashed, uid = uid)
+        // 1. Try logging in locally via Room cache (case-insensitive email, supporting both hashed and plain text passwords)
+        var user = userDao.login(email, hashed, plainPassword)
+
+        // 2. If not found locally, check Realtime Database if online
+        if (user == null && ConnectionDetector.isConnected(context)) {
+            val cloudUser = fetchUserFromFirebase(email)
+            if (cloudUser != null) {
+                val isPasswordValid = cloudUser.passwordHash == "PROTECTED" ||
+                        cloudUser.passwordHash.isBlank() ||
+                        cloudUser.passwordHash == hashed ||
+                        cloudUser.passwordHash == plainPassword
+                if (isPasswordValid) {
+                    val userToInsert =
+                        if (cloudUser.passwordHash == "PROTECTED" || cloudUser.passwordHash.isBlank()) {
+                            cloudUser.copy(passwordHash = hashed)
+                        } else {
+                            cloudUser
+                        }
                     val newId = userDao.insertUser(userToInsert)
                     user = userToInsert.copy(id = newId.toInt())
-                } else {
-                    user = UserEntity(
-                        id = 0,
-                        uid = uid,
-                        firstName = email.substringBefore("@").replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase() else it.toString()
-                        },
-                        lastName = "User",
-                        gender = "Male",
-                        address = "Registered Address",
-                        contactNo = "03000000000",
-                        email = email,
-                        passwordHash = hashed,
-                        role = when {
-                            email.contains("admin", ignoreCase = true) -> "ADMIN"
-                            email.contains("mod", ignoreCase = true) -> "MODERATOR"
-                            else -> "USER"
-                        }
-                    )
-                    val newId = userDao.insertUser(user)
-                    user = user.copy(id = newId.toInt())
-                    remoteSyncManager.uploadUser(user)
                 }
             }
+        }
+
+        if (user == null) {
+            throw Exception("Invalid email or password")
+        }
+        if (!user.isActive) {
+            throw Exception("Account is deactivated")
         }
         return user
     }
 
-    private suspend fun fetchUserFromFirebase(email: String, uid: String): UserEntity? {
+    private suspend fun fetchUserFromFirebase(email: String): UserEntity? {
         return try {
             val fallbackUrl = Constant.DATABASE_URL
             val db = try {
@@ -86,35 +73,39 @@ class UserRepository @Inject constructor(
             val snapshot = db.reference.child("users").get().await()
             for (child in snapshot.children) {
                 val childEmail = child.child("email").getValue(String::class.java) ?: ""
-                val childUid = child.child("uid").getValue(String::class.java) ?: ""
-                if (childEmail.equals(
-                        email,
-                        ignoreCase = true
-                    ) || (uid.isNotBlank() && childUid == uid)
-                ) {
+                if (childEmail.equals(email, ignoreCase = true)) {
+                    val id = child.child("id").getValue(Int::class.java) ?: 0
+                    val uid = child.child("uid").getValue(String::class.java) ?: UUID.randomUUID()
+                        .toString()
                     val firstName = child.child("firstName").getValue(String::class.java) ?: ""
                     val lastName = child.child("lastName").getValue(String::class.java) ?: ""
                     val gender = child.child("gender").getValue(String::class.java) ?: "Male"
                     val address = child.child("address").getValue(String::class.java) ?: ""
                     val contactNo = child.child("contactNo").getValue(String::class.java) ?: ""
+                    val passwordHash =
+                        child.child("passwordHash").getValue(String::class.java) ?: ""
                     val fcmToken = child.child("fcmToken").getValue(String::class.java) ?: ""
                     val role = child.child("role").getValue(String::class.java) ?: "USER"
                     val domain = child.child("domain").getValue(String::class.java)
+                    val isActive = child.child("active").getValue(Boolean::class.java)
+                        ?: child.child("isActive").getValue(Boolean::class.java) ?: true
                     val dateOfRegistration =
                         child.child("dateOfRegistration").getValue(Long::class.java)
                             ?: System.currentTimeMillis()
+
                     return UserEntity(
-                        id = 0,
-                        uid = if (childUid.isNotBlank()) childUid else uid,
+                        id = id,
+                        uid = uid,
                         firstName = firstName,
                         lastName = lastName,
                         gender = gender,
                         address = address,
                         contactNo = contactNo,
                         email = email,
-                        passwordHash = "PROTECTED",
+                        passwordHash = passwordHash,
                         role = role,
                         domain = domain,
+                        isActive = isActive,
                         dateOfRegistration = dateOfRegistration,
                         fcmToken = fcmToken
                     )
@@ -127,35 +118,23 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun loginLocally(email: String, passwordHash: String): UserEntity? {
-        return userDao.login(email, passwordHash)
+        return userDao.login(email, passwordHash, passwordHash)
     }
 
     suspend fun register(user: UserEntity, plainPassword: String = ""): Result<Long> {
-        if (!ConnectionDetector.isConnected(context)) {
-            return Result.failure(Exception("Internet connection required to register an account."))
-        }
         return try {
-            val passToUse = if (plainPassword.isNotBlank()) plainPassword else "Default123"
-            var firebaseUid = user.uid
+            val hashed =
+                if (plainPassword.isNotBlank()) PasswordHasher.hash(plainPassword) else user.passwordHash
+            val uid = if (user.uid.isBlank()) UUID.randomUUID().toString() else user.uid
 
-            if (firebaseUid.isBlank()) {
-                try {
-                    val authResult =
-                        firebaseAuth.createUserWithEmailAndPassword(user.email, passToUse).await()
-                    firebaseUid = authResult.user?.uid ?: ""
-                } catch (e: Exception) {
-                    try {
-                        val authResult =
-                            firebaseAuth.signInWithEmailAndPassword(user.email, passToUse).await()
-                        firebaseUid = authResult.user?.uid ?: ""
-                    } catch (_: Exception) {
-                    }
-                }
+            val existing = userDao.getUserByEmail(user.email)
+            if (existing != null) {
+                return Result.failure(Exception("Email already registered"))
             }
 
-            val userWithUid = user.copy(uid = firebaseUid)
-            val id = userDao.insertUser(userWithUid)
-            val registeredUser = userWithUid.copy(id = id.toInt())
+            val userToSave = user.copy(uid = uid, passwordHash = hashed)
+            val id = userDao.insertUser(userToSave)
+            val registeredUser = userToSave.copy(id = id.toInt())
             remoteSyncManager.uploadUser(registeredUser)
 
             Result.success(id)
@@ -218,8 +197,8 @@ class UserRepository @Inject constructor(
 
     suspend fun deleteUser(user: UserEntity) {
         ensureOnline("delete user")
+        remoteSyncManager.deleteUser(user.id, user.uid)
         userDao.deleteUser(user)
-        remoteSyncManager.deleteUser(user.id)
     }
 
     suspend fun countAdmins() = userDao.countUsersByRole("ADMIN")

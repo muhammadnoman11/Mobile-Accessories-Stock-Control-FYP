@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Payments
@@ -55,7 +56,7 @@ import com.fyp.mobileaccessories.stockcontrol.util.DateUtils
 import com.fyp.mobileaccessories.stockcontrol.util.PaymentMode
 
 // ============================================================
-// FILE: ManagePaymentsScreen.kt — Transactions / mock payments
+// FILE: ManagePaymentsScreen.kt — Transactions / mock payments & refunds
 // ============================================================
 
 @Composable
@@ -64,9 +65,11 @@ fun ManagePaymentsScreen(
     viewModel: AdminViewModel = hiltViewModel()
 ) {
     val transactions by viewModel.transactions.collectAsStateWithLifecycle()
+    val orders by viewModel.orders.collectAsStateWithLifecycle()
     var snack by remember { mutableStateOf("") }
     val snackState = remember { SnackbarHostState() }
     var remarksTarget by remember { mutableStateOf<Pair<Int, Boolean>?>(null) } // id, isApprove
+    var refundTarget by remember { mutableStateOf<Int?>(null) } // txId for refund
 
     LaunchedEffect(snack) {
         if (snack.isNotBlank()) {
@@ -74,7 +77,7 @@ fun ManagePaymentsScreen(
         }
     }
 
-    val statusOptions = listOf("", "PENDING", "APPROVED", "REJECTED")
+    val statusOptions = listOf("", "PENDING", "APPROVED", "REJECTED", "REFUND_PENDING", "REFUNDED")
 
     Scaffold(
         topBar = {
@@ -96,7 +99,7 @@ fun ManagePaymentsScreen(
                     FilterChip(
                         selected = false,
                         onClick = { viewModel.onTxStatusFilter(s) },
-                        label = { Text(if (s.isEmpty()) "All" else s) }
+                        label = { Text(if (s.isEmpty()) "All" else s.replace("_", " ")) }
                     )
                 }
             }
@@ -108,6 +111,9 @@ fun ManagePaymentsScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(transactions, key = { it.id }) { tx ->
+                        val order = orders.find { it.id == tx.orderId }
+                        val isOrderCancelled = order?.status == "CANCELLED"
+
                         TransactionCard(
                             txId = tx.id,
                             orderId = tx.orderId,
@@ -117,8 +123,10 @@ fun ManagePaymentsScreen(
                             refNo = tx.referenceNo,
                             date = tx.transactionDate,
                             remarks = tx.remarks,
+                            isOrderCancelled = isOrderCancelled,
                             onApprove = { remarksTarget = Pair(tx.id, true) },
-                            onReject = { remarksTarget = Pair(tx.id, false) }
+                            onReject = { remarksTarget = Pair(tx.id, false) },
+                            onRefund = { refundTarget = tx.id }
                         )
                     }
                 }
@@ -129,7 +137,9 @@ fun ManagePaymentsScreen(
     // Remarks dialog for approve/reject
     remarksTarget?.let { (txId, isApprove) ->
         RemarksDialog(
-            isApprove = isApprove,
+            title = if (isApprove) "Approve Transaction" else "Reject Transaction",
+            confirmLabel = if (isApprove) "Approve" else "Reject",
+            confirmColor = if (isApprove) AppColors.Success else AppColors.Error,
             onDismiss = { remarksTarget = null },
             onConfirm = { remarks ->
                 if (isApprove)
@@ -140,13 +150,28 @@ fun ManagePaymentsScreen(
             }
         )
     }
+
+    // Refund Dialog
+    refundTarget?.let { txId ->
+        RemarksDialog(
+            title = "Process Refund",
+            confirmLabel = "Refund",
+            confirmColor = AppColors.Warning,
+            onDismiss = { refundTarget = null },
+            onConfirm = { remarks ->
+                viewModel.refundTransaction(txId, remarks) { snack = "Refund processed successfully" }
+                refundTarget = null
+            }
+        )
+    }
 }
 
 @Composable
 private fun TransactionCard(
     txId: Int, orderId: Int, amount: Double, mode: String,
     status: String, refNo: String, date: Long, remarks: String,
-    onApprove: () -> Unit, onReject: () -> Unit
+    isOrderCancelled: Boolean,
+    onApprove: () -> Unit, onReject: () -> Unit, onRefund: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -180,22 +205,34 @@ private fun TransactionCard(
                     color = AppColors.Primary
                 )
 
-            if (status == "PENDING") {
+            val showRefundButton = status == "REFUND_PENDING" || (status == "APPROVED" && isOrderCancelled && mode != "CASH_ON_DELIVERY")
+
+            if (status == "PENDING" || showRefundButton) {
                 Spacer(Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(
-                        onClick = onApprove, modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = AppColors.Success)
-                    ) {
-                        Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(4.dp)); Text("Approve")
-                    }
-                    OutlinedButton(
-                        onClick = onReject, modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Error)
-                    ) {
-                        Icon(Icons.Default.Cancel, null, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(4.dp)); Text("Reject")
+                    if (status == "PENDING") {
+                        Button(
+                            onClick = onApprove, modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Success)
+                        ) {
+                            Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(16.dp))
+                            Spacer(Modifier.width(4.dp)); Text("Approve")
+                        }
+                        OutlinedButton(
+                            onClick = onReject, modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Error)
+                        ) {
+                            Icon(Icons.Default.Cancel, null, modifier = Modifier.size(16.dp))
+                            Spacer(Modifier.width(4.dp)); Text("Reject")
+                        }
+                    } else {
+                        Button(
+                            onClick = onRefund, modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Warning)
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.Undo, null, modifier = Modifier.size(16.dp))
+                            Spacer(Modifier.width(4.dp)); Text("Process Refund")
+                        }
                     }
                 }
             }
@@ -204,16 +241,17 @@ private fun TransactionCard(
 }
 
 @Composable
-private fun RemarksDialog(isApprove: Boolean, onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
+private fun RemarksDialog(
+    title: String = "Approve Transaction",
+    confirmLabel: String = "Approve",
+    confirmColor: Color = AppColors.Success,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
     var remarks by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = {
-            Text(
-                if (isApprove) "Approve Transaction" else "Reject Transaction",
-                fontWeight = FontWeight.Bold
-            )
-        },
+        title = { Text(title, fontWeight = FontWeight.Bold) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("Add optional remarks for this decision:")
@@ -227,10 +265,8 @@ private fun RemarksDialog(isApprove: Boolean, onDismiss: () -> Unit, onConfirm: 
         confirmButton = {
             Button(
                 onClick = { onConfirm(remarks) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isApprove) AppColors.Success else AppColors.Error
-                )
-            ) { Text(if (isApprove) "Approve" else "Reject") }
+                colors = ButtonDefaults.buttonColors(containerColor = confirmColor)
+            ) { Text(confirmLabel) }
         },
         dismissButton = { OutlinedButton(onClick = onDismiss) { Text("Cancel") } },
         shape = RoundedCornerShape(16.dp)

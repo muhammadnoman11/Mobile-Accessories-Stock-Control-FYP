@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -24,11 +25,7 @@ import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTextField
 import com.fyp.mobileaccessories.stockcontrol.ui.component.PrimaryButton
 import com.fyp.mobileaccessories.stockcontrol.ui.component.RequestNotificationPermissionEffect
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-
-// ============================================================
-// FILE: presentation/auth/LoginScreen.kt
-// Login screen — email + password, role-based navigation on success
-// ============================================================
+import com.fyp.mobileaccessories.stockcontrol.moderator.R
 
 @Composable
 fun LoginScreen(
@@ -39,13 +36,11 @@ fun LoginScreen(
 
     RequestNotificationPermissionEffect()
 
-    // After successful login, navigate to the correct role dashboard
     fun onLoginSuccess(role: String) {
         navController.navigateAndClear(Screen.ModDashboard.route)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Top gradient header
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -65,35 +60,33 @@ fun LoginScreen(
         ) {
             Spacer(Modifier.height(48.dp))
 
-            // App Icon
             Box(
                 modifier = Modifier
-                    .size(80.dp)
-                    .background(Color.White.copy(alpha = 0.2f), CircleShape),
+                    .size(100.dp)
+                    .background(Color.White.copy(alpha = 0.8f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    Icons.Default.Inventory2, contentDescription = null,
-                    tint = Color.White, modifier = Modifier.size(44.dp)
+                Image(
+                    painter = painterResource(R.drawable.moderator_icon),
+                    contentDescription = "",
+                    modifier = Modifier.size(80.dp)
                 )
             }
             Spacer(Modifier.height(12.dp))
+
             Text(
-                "StockControl", style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold, color = Color.White
-            )
-            Text(
-                "Moderator Control Panel", style = MaterialTheme.typography.bodyMedium,
+                "Moderator Stock Control Panel", style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold, color = Color.White
             )
+            Spacer(Modifier.height(4.dp))
             Text(
-                "Sign in to approve products and track deliveries", style = MaterialTheme.typography.bodySmall,
+                "Sign in to approve products and track deliveries",
+                style = MaterialTheme.typography.bodySmall,
                 color = Color.White.copy(alpha = 0.8f)
             )
 
             Spacer(Modifier.height(40.dp))
 
-            // ── Login Card ────────────────────────────────────
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -118,7 +111,6 @@ fun LoginScreen(
                         color = AppColors.TextSecondary
                     )
 
-                    // Error message
                     if (state.error != null) {
                         Surface(
                             color = AppColors.ErrorContainer,
@@ -143,7 +135,6 @@ fun LoginScreen(
                         }
                     }
 
-                    // Email field
                     AppTextField(
                         value = state.email,
                         onValueChange = viewModel::onEmailChange,
@@ -153,7 +144,6 @@ fun LoginScreen(
                         isError = state.error != null
                     )
 
-                    // Password field
                     AppTextField(
                         value = state.password,
                         onValueChange = viewModel::onPasswordChange,
@@ -163,7 +153,6 @@ fun LoginScreen(
                         isError = state.error != null
                     )
 
-                    // Login button
                     PrimaryButton(
                         text = "Sign In",
                         onClick = { viewModel.login(::onLoginSuccess) },
@@ -175,26 +164,19 @@ fun LoginScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Default credential hint
-            Spacer(Modifier.height(8.dp))
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = AppColors.InfoContainer)
+            // Register Moderator Link
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Text(
-                        "Demo Credentials",
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold, color = AppColors.Info
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        "Moderator: mod@stock.com / Mod@123",
-                        style = MaterialTheme.typography.bodySmall, color = AppColors.Info
-                    )
+                Text(
+                    "Don't have an account?  ",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.TextSecondary
+                )
+                TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
+                    Text("Register", fontWeight = FontWeight.Bold, color = AppColors.Primary)
                 }
             }
             Spacer(Modifier.height(24.dp))

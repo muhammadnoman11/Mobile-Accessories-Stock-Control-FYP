@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fyp.mobileaccessories.stockcontrol.data.local.entity.UserEntity
 import com.fyp.mobileaccessories.stockcontrol.data.repository.UserRepository
+import com.fyp.mobileaccessories.stockcontrol.util.FcmTokenHelper
 import com.fyp.mobileaccessories.stockcontrol.util.PasswordHasher
 import com.fyp.mobileaccessories.stockcontrol.util.SessionData
 import com.fyp.mobileaccessories.stockcontrol.util.SessionManager
@@ -20,11 +21,9 @@ import javax.inject.Inject
 
 // ============================================================
 // FILE: presentation/auth/AuthViewModel.kt
-// Handles login, registration, and session management.
-// Used by SplashScreen, LoginScreen, and RegisterScreen.
+// Handles login, registration (Moderator), and session management with FCM tokens.
 // ============================================================
 
-// ── UI State: Login Screen ────────────────────────────────────
 data class LoginUiState(
     val email: String = "",
     val password: String = "",
@@ -32,11 +31,11 @@ data class LoginUiState(
     val error: String? = null
 )
 
-// ── UI State: Register Screen ─────────────────────────────────
 data class RegisterUiState(
     val firstName: String = "",
     val lastName: String = "",
     val gender: String = "Male",
+    val domain: String = "",
     val address: String = "",
     val contactNo: String = "",
     val email: String = "",
@@ -53,7 +52,6 @@ class AuthViewModel @Inject constructor(
     private val sessionManager: SessionManager
 ) : ViewModel() {
 
-    // ── Session flow — null means not logged in ───────────────
     val session: StateFlow<SessionData?> = sessionManager.sessionFlow
         .stateIn(
             scope = viewModelScope,
@@ -61,22 +59,19 @@ class AuthViewModel @Inject constructor(
             initialValue = null
         )
 
-    // ── Login State ───────────────────────────────────────────
     private val _loginState = MutableStateFlow(LoginUiState())
     val loginState: StateFlow<LoginUiState> = _loginState.asStateFlow()
 
-    // ── Register State ────────────────────────────────────────
     private val _registerState = MutableStateFlow(RegisterUiState())
     val registerState: StateFlow<RegisterUiState> = _registerState.asStateFlow()
 
-    // ── Login field handlers ──────────────────────────────────
     fun onEmailChange(v: String) = _loginState.update { it.copy(email = v.trim(), error = null) }
     fun onPasswordChange(v: String) = _loginState.update { it.copy(password = v, error = null) }
 
-    // ── Register field handlers ───────────────────────────────
     fun onRegFirstName(v: String) = _registerState.update { it.copy(firstName = v, error = null) }
     fun onRegLastName(v: String) = _registerState.update { it.copy(lastName = v, error = null) }
     fun onRegGender(v: String) = _registerState.update { it.copy(gender = v, error = null) }
+    fun onRegDomain(v: String) = _registerState.update { it.copy(domain = v, error = null) }
     fun onRegAddress(v: String) = _registerState.update { it.copy(address = v, error = null) }
     fun onRegContactNo(v: String) = _registerState.update { it.copy(contactNo = v, error = null) }
     fun onRegEmail(v: String) = _registerState.update { it.copy(email = v.trim(), error = null) }
@@ -84,9 +79,6 @@ class AuthViewModel @Inject constructor(
     fun onRegConfirmPassword(v: String) =
         _registerState.update { it.copy(confirmPassword = v, error = null) }
 
-    // ── LOGIN ─────────────────────────────────────────────────
-    // Validates fields, calls repository login (password hashed),
-    // saves session to DataStore, then fires onSuccess(role)
     fun login(onSuccess: (role: String) -> Unit) {
         val s = _loginState.value
         if (s.email.isBlank() || s.password.isBlank()) {
@@ -99,13 +91,14 @@ class AuthViewModel @Inject constructor(
                 val user = userRepository.login(s.email, s.password)
                 if (user != null) {
                     if (user.role == "MODERATOR") {
-                        // Persist login session in DataStore (survives app restart)
                         sessionManager.saveSession(
                             userId = user.id,
                             role = user.role,
                             name = "${user.firstName} ${user.lastName}",
                             email = user.email
                         )
+                        persistUserFcmToken(user.id)
+
                         _loginState.update { it.copy(isLoading = false) }
                         onSuccess(user.role)
                     } else {
@@ -125,7 +118,6 @@ class AuthViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                // Offline fallback using local Room DB
                 val localUser = userRepository.loginLocally(s.email, PasswordHasher.hash(s.password))
                 if (localUser != null && localUser.role == "MODERATOR") {
                     sessionManager.saveSession(
@@ -134,6 +126,8 @@ class AuthViewModel @Inject constructor(
                         name = "${localUser.firstName} ${localUser.lastName}",
                         email = localUser.email
                     )
+                    persistUserFcmToken(localUser.id)
+
                     _loginState.update { it.copy(isLoading = false) }
                     onSuccess(localUser.role)
                 } else {
@@ -148,27 +142,24 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    // ── REGISTER ──────────────────────────────────────────────
-    // Self-registration always creates a USER role account.
-    // Admin creates MODERATOR accounts from the admin panel.
     fun register(onSuccess: () -> Unit) {
         val s = _registerState.value
-        // Client-side validation before hitting the DB
         val error = when {
             s.firstName.isBlank() -> "First name is required"
             s.lastName.isBlank() -> "Last name is required"
+            s.domain.isBlank() -> "Product domain is required"
             s.address.isBlank() -> "Address is required"
             s.contactNo.isBlank() -> "Contact number is required"
             s.email.isBlank() -> "Email is required"
             !Patterns.EMAIL_ADDRESS.matcher(s.email).matches()
                 -> "Enter a valid email address"
-
             s.password.length < 6 -> "Password must be at least 6 characters"
             s.password != s.confirmPassword -> "Passwords do not match"
             else -> null
         }
         if (error != null) {
-            _registerState.update { it.copy(error = error) }; return
+            _registerState.update { it.copy(error = error) }
+            return
         }
 
         _registerState.update { it.copy(isLoading = true, error = null) }
@@ -178,15 +169,23 @@ class AuthViewModel @Inject constructor(
                     firstName = s.firstName.trim(),
                     lastName = s.lastName.trim(),
                     gender = s.gender,
+                    domain = s.domain.trim(),
                     address = s.address.trim(),
                     contactNo = s.contactNo.trim(),
                     email = s.email,
                     passwordHash = PasswordHasher.hash(s.password),
-                    role = "USER"  // Always USER from self-registration
+                    role = "MODERATOR",
+                    dateOfRegistration = System.currentTimeMillis()
                 ),
                 plainPassword = s.password
             )
             if (result.isSuccess) {
+                val userId = result.getOrNull()?.toInt() ?: 0
+                val newUser = userRepository.getUserById(userId)
+                if (newUser != null) {
+                    persistUserFcmToken(newUser.id)
+                }
+
                 _registerState.update { it.copy(isLoading = false, isSuccess = true) }
                 onSuccess()
             } else {
@@ -200,7 +199,13 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    // ── LOGOUT ────────────────────────────────────────────────
+    private suspend fun persistUserFcmToken(userId: Int) {
+        val token = FcmTokenHelper.fetchCurrentToken()
+        userRepository.updateFcmToken(userId, token)
+    }
+
+    suspend fun checkUserExists(userId: Int): UserEntity? = userRepository.getUserById(userId)
+
     fun logout(onLogout: () -> Unit) {
         viewModelScope.launch {
             sessionManager.clearSession()

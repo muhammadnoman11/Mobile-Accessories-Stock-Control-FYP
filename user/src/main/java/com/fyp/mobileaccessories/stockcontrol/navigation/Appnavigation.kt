@@ -1,11 +1,18 @@
 package com.fyp.mobileaccessories.stockcontrol.navigation
 
+import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.fyp.mobileaccessories.stockcontrol.navigation.Screen
@@ -19,12 +26,15 @@ import com.fyp.mobileaccessories.stockcontrol.ui.screen.user.ProductDetailScreen
 import com.fyp.mobileaccessories.stockcontrol.ui.screen.user.ProductListScreen
 import com.fyp.mobileaccessories.stockcontrol.ui.screen.user.UserHomeScreen
 import com.fyp.mobileaccessories.stockcontrol.ui.screen.user.UserProfileScreen
+import com.fyp.mobileaccessories.stockcontrol.ui.screen.user.UserViewModel
 
 @Composable
 fun AppNavigation(
     navController: NavHostController = rememberNavController(),
     startDestination: String = Screen.Splash.route
 ) {
+    RealtimeSessionObserver(navController = navController)
+
     NavHost(
         navController = navController,
         startDestination = startDestination
@@ -69,6 +79,30 @@ fun AppNavigation(
         }
         composable(Screen.Announcements.route) {
             AnnouncementsScreen(navController = navController)
+        }
+    }
+}
+
+@Composable
+private fun RealtimeSessionObserver(navController: NavHostController) {
+    val viewModel: UserViewModel = hiltViewModel()
+    val session by viewModel.session.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    LaunchedEffect(session, currentRoute) {
+        if (currentRoute == Screen.Login.route ||
+            currentRoute == Screen.Register.route ||
+            currentRoute == Screen.Splash.route ||
+            currentRoute == null
+        ) {
+            return@LaunchedEffect
+        }
+
+        if (session == null) {
+            Toast.makeText(context, "Your account has been deleted by admin", Toast.LENGTH_LONG).show()
+            navController.navigateAndClear(Screen.Login.route)
         }
     }
 }

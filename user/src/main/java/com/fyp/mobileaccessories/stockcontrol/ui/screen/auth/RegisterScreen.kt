@@ -1,12 +1,5 @@
 package com.fyp.mobileaccessories.stockcontrol.ui.screen.auth
 
-// ============================================================
-// FILE: presentation/auth/RegisterScreen.kt
-// User self-registration form — firstName, lastName, gender,
-// address, contactNo, email, password, confirmPassword.
-// Self-registration always creates USER role.
-// ============================================================
-
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -118,7 +111,6 @@ fun RegisterScreen(
                     value = state.firstName,
                     onValueChange = viewModel::onRegFirstName,
                     label = "First Name",
-                    leadingIcon = Icons.Default.Person,
                     modifier = Modifier.weight(1f)
                 )
                 AppTextField(
@@ -191,7 +183,7 @@ fun RegisterScreen(
                 ) {
                     Icon(Icons.Default.Info, null, tint = AppColors.Info,
                         modifier = Modifier.size(16.dp))
-                    Text("Your account will be registered as a Customer (USER) role.",
+                    Text("Your account will be registered as a Customer.",
                         style = MaterialTheme.typography.bodySmall,
                         color = AppColors.Info)
                 }

@@ -320,6 +320,14 @@ class AdminViewModel @Inject constructor(
         }
     }
 
+    fun refundTransaction(id: Int, remarks: String, onDone: () -> Unit) {
+        viewModelScope.launch {
+            if (!ConnectionDetector.isConnected(context)) return@launch
+            transactionRepo.updateStatus(id, "REFUNDED", remarks)
+            onDone()
+        }
+    }
+
     // ──────────────────────────────────────────────────────────
     // ANNOUNCEMENTS
     // ──────────────────────────────────────────────────────────
