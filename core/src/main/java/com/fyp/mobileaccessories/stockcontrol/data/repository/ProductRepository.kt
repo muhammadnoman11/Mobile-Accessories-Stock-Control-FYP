@@ -63,19 +63,21 @@ class ProductRepository @Inject constructor(
         return productDao.countProductsByName(name.trim(), excludeId) > 0
     }
 
-    suspend fun setApprovalStatus(productId: Int, approved: Boolean) {
+    suspend fun setApprovalStatus(productId: Int, approved: Boolean, rejectionReason: String = "") {
         ensureOnline(if (approved) "approve product" else "reject product")
         val status = if (approved) "APPROVED" else "REJECTED"
-        productDao.setApprovalStatus(productId, approved, status)
+        productDao.setApprovalStatus(productId, approved, status, rejectionReason)
         remoteSyncManager.updateProductApproval(productId, approved)
 
         val product = productDao.getProductById(productId)
         if (product != null) {
-            remoteSyncManager.uploadProduct(product)
+            val updated = product.copy(isApproved = approved, status = status, rejectionReason = rejectionReason)
+            productDao.insertProduct(updated)
+            remoteSyncManager.uploadProduct(updated)
             NotificationHelper.sendProductApprovalNotification(
-                productName = product.name,
+                productName = updated.name,
                 isApproved = approved,
-                imageUrl = product.imageUrl
+                imageUrl = updated.imageUrl
             )
         }
     }

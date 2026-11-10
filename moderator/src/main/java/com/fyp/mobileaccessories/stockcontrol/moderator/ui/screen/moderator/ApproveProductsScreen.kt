@@ -133,7 +133,7 @@ fun ApproveProductsScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.rejectProduct(target.id) { ok, msg ->
+                        viewModel.rejectProduct(target.id, reason) { ok, msg ->
                             snack = if (ok) "❌ ${target.name} rejected" else msg
                         }
                         rejectTarget = null

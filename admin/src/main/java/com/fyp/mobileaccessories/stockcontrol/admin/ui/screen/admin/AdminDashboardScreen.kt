@@ -127,7 +127,8 @@ fun AdminDashboardScreen(
                         onClick = { navController.navigate(Screen.StockReport.route) }
                     ),
                     OverviewItem(
-                        title = "Pending Orders",
+//                        title = "Pending Orders",
+                        title = "Orders",
                         value = stats.pendingOrders.toString(),
                         icon = Icons.Default.ShoppingCart,
                         containerColor = AppColors.InfoContainer,

@@ -49,8 +49,8 @@ interface ProductDao {
     @Query("SELECT * FROM products WHERE id = :id LIMIT 1")
     suspend fun getProductById(id: Int): ProductEntity?
 
-    @Query("UPDATE products SET isApproved = :approved, status = :status WHERE id = :productId")
-    suspend fun setApprovalStatus(productId: Int, approved: Boolean, status: String)
+    @Query("UPDATE products SET isApproved = :approved, status = :status, rejectionReason = :rejectionReason WHERE id = :productId")
+    suspend fun setApprovalStatus(productId: Int, approved: Boolean, status: String, rejectionReason: String)
 
     @Query("UPDATE products SET stockQuantity = :newQuantity WHERE id = :productId")
     suspend fun updateStock(productId: Int, newQuantity: Int)

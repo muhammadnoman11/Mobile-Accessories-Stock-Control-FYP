@@ -36,6 +36,7 @@ class ProductSyncHandler(
                         ?: child.child("approved").getValue(Boolean::class.java) ?: false
                     val status = child.child("status").getValue(String::class.java)
                         ?: if (isApproved) "APPROVED" else "PENDING"
+                    val rejectionReason = child.child("rejectionReason").getValue(String::class.java) ?: ""
                     val dateAdded = child.child("dateAdded").getValue(Long::class.java) ?: System.currentTimeMillis()
                     val imageUrl = child.child("imageUrl").getValue(String::class.java)?.trim() ?: ""
 
@@ -43,7 +44,8 @@ class ProductSyncHandler(
                         id = id, name = name, description = description, categoryId = categoryId,
                         subCategory = subCategory, price = price, stockQuantity = stockQuantity,
                         lowStockThreshold = lowStockThreshold, addedByUserId = addedByUserId,
-                        isApproved = isApproved, status = status, dateAdded = dateAdded, imageUrl = imageUrl
+                        isApproved = isApproved, status = status, rejectionReason = rejectionReason,
+                        dateAdded = dateAdded, imageUrl = imageUrl
                     )
                     productDao.insertProduct(product)
                 } catch (e: Exception) {
@@ -72,6 +74,7 @@ class ProductSyncHandler(
             "addedByUserId" to (product.addedByUserId as Any?),
             "isApproved" to product.isApproved,
             "status" to product.status,
+            "rejectionReason" to product.rejectionReason,
             "dateAdded" to product.dateAdded,
             "imageUrl" to product.imageUrl
         )

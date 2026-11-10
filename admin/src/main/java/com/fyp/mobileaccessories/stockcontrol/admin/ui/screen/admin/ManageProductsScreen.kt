@@ -155,6 +155,8 @@ fun ManageProductsScreen(
                             lowStockThreshold = product.lowStockThreshold,
                             imageUrl = product.imageUrl,
                             isApproved = product.isApproved,
+                            status = product.status,
+                            rejectionReason = product.rejectionReason,
                             onEdit = if (isEmployee) null else {
                                 {
                                     navController.navigate(

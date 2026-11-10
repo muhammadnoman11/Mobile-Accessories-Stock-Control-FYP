@@ -21,6 +21,7 @@ data class ProductEntity(
     val addedByUserId: Int?,
     val isApproved: Boolean = false,
     val status: String = "PENDING", // "PENDING", "APPROVED", "REJECTED"
+    val rejectionReason: String = "",
     val dateAdded: Long = System.currentTimeMillis(),
     val imageUrl: String = ""
 )

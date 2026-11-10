@@ -93,6 +93,8 @@ fun ProductCard(
     lowStockThreshold: Int,
     imageUrl: String = "",
     isApproved: Boolean = true,
+    status: String = "PENDING",
+    rejectionReason: String = "",
     onEdit: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
@@ -143,6 +145,15 @@ fun ProductCard(
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
+                    if (status == "REJECTED" && rejectionReason.isNotBlank()) {
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            "Reason: $rejectionReason",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AppColors.Error,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
@@ -151,18 +162,33 @@ fun ProductCard(
                         fontWeight = FontWeight.Bold,
                         color = AppColors.Primary
                     )
-                    if (!isApproved) {
-                        Spacer(Modifier.height(4.dp))
-                        Surface(
-                            shape = RoundedCornerShape(20.dp),
-                            color = AppColors.WarningContainer
-                        ) {
-                            Text(
-                                "Pending",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = AppColors.Warning,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                            )
+                    Spacer(Modifier.height(4.dp))
+                    when {
+                        status == "REJECTED" -> {
+                            Surface(
+                                shape = RoundedCornerShape(20.dp),
+                                color = AppColors.ErrorContainer
+                            ) {
+                                Text(
+                                    "Rejected",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = AppColors.Error,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                                )
+                            }
+                        }
+                        status == "PENDING" || !isApproved -> {
+                            Surface(
+                                shape = RoundedCornerShape(20.dp),
+                                color = AppColors.WarningContainer
+                            ) {
+                                Text(
+                                    "Pending",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = AppColors.Warning,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                                )
+                            }
                         }
                     }
                 }

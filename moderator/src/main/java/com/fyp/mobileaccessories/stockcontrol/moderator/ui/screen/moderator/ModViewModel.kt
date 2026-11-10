@@ -87,14 +87,14 @@ class ModViewModel @Inject constructor(
     }
 
     // Reject product — requires internet
-    fun rejectProduct(productId: Int, onDone: (Boolean, String) -> Unit) {
+    fun rejectProduct(productId: Int, reason: String, onDone: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             if (!ConnectionDetector.isConnected(context)) {
                 onDone(false, "Internet connection required to reject product.")
                 return@launch
             }
             try {
-                productRepo.setApprovalStatus(productId, false)
+                productRepo.setApprovalStatus(productId, false, reason)
                 onDone(true, "Product rejected")
             } catch (e: Exception) {
                 onDone(false, e.message ?: "Error")
