@@ -292,7 +292,9 @@ class AdminViewModel @Inject constructor(
     // TRANSACTIONS (PAYMENTS)
     // ──────────────────────────────────────────────────────────
     private val _txStatusFilter = MutableStateFlow("")
+    val txStatusFilter = _txStatusFilter.asStateFlow()
     private val _txPayModeFilter = MutableStateFlow("")
+    val txPayModeFilter = _txPayModeFilter.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val transactions: StateFlow<List<TransactionEntity>> = combine(

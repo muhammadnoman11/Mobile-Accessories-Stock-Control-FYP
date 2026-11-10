@@ -34,6 +34,22 @@ fun LoginScreen(
 ) {
     val state by viewModel.loginState.collectAsStateWithLifecycle()
 
+    val registeredMsg = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow<String?>("registered_msg", null)
+        ?.collectAsStateWithLifecycle()?.value
+
+    val registeredEmail = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow<String?>("registered_email", null)
+        ?.collectAsStateWithLifecycle()?.value
+
+    LaunchedEffect(registeredEmail) {
+        if (!registeredEmail.isNullOrBlank() && state.email.isBlank()) {
+            viewModel.onEmailChange(registeredEmail)
+        }
+    }
+
     RequestNotificationPermissionEffect()
 
     fun onLoginSuccess(role: String) {
@@ -110,6 +126,31 @@ fun LoginScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = AppColors.TextSecondary
                     )
+
+                    // Registration Success Message Banner
+                    if (registeredMsg != null) {
+                        Surface(
+                            color = AppColors.SuccessContainer,
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.CheckCircle, contentDescription = null,
+                                    tint = AppColors.Success, modifier = Modifier.size(16.dp)
+                                )
+                                Text(
+                                    registeredMsg, style = MaterialTheme.typography.bodySmall,
+                                    color = AppColors.Success, fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
 
                     if (state.error != null) {
                         Surface(

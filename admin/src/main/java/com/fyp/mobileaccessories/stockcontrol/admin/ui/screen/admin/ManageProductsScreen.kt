@@ -110,14 +110,22 @@ fun ManageProductsScreen(
                     FilterChip(
                         selected = catFilter == -1,
                         onClick = { viewModel.onProductCategoryChange(-1) },
-                        label = { Text("All") }
+                        label = { Text("All") },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = AppColors.Primary,
+                            selectedLabelColor = Color.White
+                        )
                     )
                 }
                 items(categories) { cat ->
                     FilterChip(
                         selected = catFilter == cat.id,
                         onClick = { viewModel.onProductCategoryChange(cat.id) },
-                        label = { Text(cat.name) }
+                        label = { Text(cat.name) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = AppColors.Primary,
+                            selectedLabelColor = Color.White
+                        )
                     )
                 }
             }

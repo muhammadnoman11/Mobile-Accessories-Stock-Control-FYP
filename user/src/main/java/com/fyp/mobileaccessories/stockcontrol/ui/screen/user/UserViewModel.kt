@@ -291,6 +291,15 @@ class UserViewModel @Inject constructor(
                 onDone(false, "Profile not found")
                 return@launch
             }
+            if (firstName.isBlank() || lastName.isBlank()) {
+                onDone(false, "First and last name are required")
+                return@launch
+            }
+            if (firstName.trim().length > 15 || lastName.trim().length > 15) {
+                onDone(false, "Name cannot exceed 15 characters")
+                return@launch
+            }
+
             val updated = current.copy(
                 firstName = firstName.trim(),
                 lastName = lastName.trim(),

@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -18,6 +19,7 @@ import com.fyp.mobileaccessories.stockcontrol.admin.ui.screen.admin.component.Ad
 import com.fyp.mobileaccessories.stockcontrol.data.local.entity.OrderEntity
 import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTopBar
 import com.fyp.mobileaccessories.stockcontrol.ui.component.EmptyState
+import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
 import com.fyp.mobileaccessories.stockcontrol.util.OrderStatus
 
 @Composable
@@ -63,7 +65,11 @@ fun AdminOrdersScreen(
                     FilterChip(
                         selected = statusFilter == s,
                         onClick = { statusFilter = s; viewModel.onOrderStatusFilter(s) },
-                        label = { Text(if (s.isEmpty()) "All" else s.replace("_", " ")) }
+                        label = { Text(if (s.isEmpty()) "All" else s.replace("_", " ")) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = AppColors.Primary,
+                            selectedLabelColor = Color.White
+                        )
                     )
                 }
             }

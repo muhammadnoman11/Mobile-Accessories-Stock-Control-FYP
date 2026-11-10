@@ -12,10 +12,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.fyp.mobileaccessories.stockcontrol.navigation.Screen
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
 import java.util.Calendar
+
+data class OverviewItem(
+    val title: String,
+    val value: String,
+    val icon: ImageVector,
+    val containerColor: Color,
+    val contentColor: Color,
+    val onClick: (() -> Unit)? = null
+)
 
 data class AdminMenuItem(
     val label: String,
@@ -111,7 +121,8 @@ fun QuickActionButton(item: AdminMenuItem, onClick: () -> Unit) {
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = item.bgColor),
-        elevation = CardDefaults.cardElevation(0.dp)
+        elevation = CardDefaults.cardElevation(0.dp),
+        modifier = Modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
@@ -127,7 +138,9 @@ fun QuickActionButton(item: AdminMenuItem, onClick: () -> Unit) {
             Text(
                 item.label, style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.SemiBold, color = item.iconColor,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

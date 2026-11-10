@@ -1,7 +1,6 @@
 package com.fyp.mobileaccessories.stockcontrol.ui.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,20 +31,28 @@ fun StatCard(
     onClick: (() -> Unit)? = null
 ) {
     Card(
-        modifier = modifier
-            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
+        onClick = { onClick?.invoke() },
+        enabled = onClick != null,
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor,
+            disabledContainerColor = containerColor,
+            contentColor = contentColor,
+            disabledContentColor = contentColor
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(42.dp)
                     .background(contentColor.copy(alpha = 0.15f), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
@@ -53,20 +60,24 @@ fun StatCard(
                     icon,
                     contentDescription = null,
                     tint = contentColor,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(22.dp)
                 )
             }
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     title,
                     style = MaterialTheme.typography.bodySmall,
-                    color = contentColor.copy(alpha = 0.7f)
+                    color = contentColor.copy(alpha = 0.7f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     value,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = contentColor
+                    color = contentColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -89,12 +100,15 @@ fun ProductCard(
 ) {
     val isLowStock = stockQuantity <= lowStockThreshold
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
+        onClick = { onClick?.invoke() },
+        enabled = onClick != null,
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White,
+            disabledContainerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -256,21 +270,28 @@ fun UserCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "$firstName $lastName",
+                        text = "$firstName $lastName",
                         style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
                     RoleBadge(role)
                 }
                 Text(
-                    email,
+                    text = email,
                     style = MaterialTheme.typography.bodySmall,
-                    color = AppColors.TextSecondary
+                    color = AppColors.TextSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    contactNo,
+                    text = contactNo,
                     style = MaterialTheme.typography.bodySmall,
-                    color = AppColors.TextSecondary
+                    color = AppColors.TextSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 if (!isActive) {
                     Text(

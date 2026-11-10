@@ -114,13 +114,21 @@ fun RegisterScreen(
                     onValueChange = viewModel::onRegFirstName,
                     label = "First Name",
                     leadingIcon = Icons.Default.Person,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    maxLength = 15,
+                    showCounter = true,
+                    isError = state.firstName.length >= 15,
+                    errorMessage = if (state.firstName.length >= 15) "Max 15 chars" else ""
                 )
                 AppTextField(
                     value = state.lastName,
                     onValueChange = viewModel::onRegLastName,
                     label = "Last Name",
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    maxLength = 15,
+                    showCounter = true,
+                    isError = state.lastName.length >= 15,
+                    errorMessage = if (state.lastName.length >= 15) "Max 15 chars" else ""
                 )
             }
 

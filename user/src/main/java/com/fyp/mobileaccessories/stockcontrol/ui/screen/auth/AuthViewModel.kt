@@ -77,8 +77,8 @@ class AuthViewModel @Inject constructor(
     fun onPasswordChange(v: String) = _loginState.update { it.copy(password = v, error = null) }
 
     // ── Register field handlers ───────────────────────────────
-    fun onRegFirstName(v: String) = _registerState.update { it.copy(firstName = v, error = null) }
-    fun onRegLastName(v: String) = _registerState.update { it.copy(lastName = v, error = null) }
+    fun onRegFirstName(v: String) = _registerState.update { it.copy(firstName = v.take(15), error = null) }
+    fun onRegLastName(v: String) = _registerState.update { it.copy(lastName = v.take(15), error = null) }
     fun onRegGender(v: String) = _registerState.update { it.copy(gender = v, error = null) }
     fun onRegAddress(v: String) = _registerState.update { it.copy(address = v, error = null) }
     fun onRegContactNo(v: String) = _registerState.update { it.copy(contactNo = v, error = null) }
@@ -163,7 +163,9 @@ class AuthViewModel @Inject constructor(
         // Client-side validation before hitting the DB
         val error = when {
             s.firstName.isBlank() -> "First name is required"
+            s.firstName.length > 15 -> "First name cannot exceed 15 characters"
             s.lastName.isBlank() -> "Last name is required"
+            s.lastName.length > 15 -> "Last name cannot exceed 15 characters"
             s.address.isBlank() -> "Address is required"
             s.contactNo.isBlank() -> "Contact number is required"
             s.email.isBlank() -> "Email is required"
@@ -197,12 +199,6 @@ class AuthViewModel @Inject constructor(
                 val userId = result.getOrNull()?.toInt() ?: 0
                 val newUser = userRepository.getUserById(userId)
                 if (newUser != null) {
-                    sessionManager.saveSession(
-                        userId = newUser.id,
-                        role = newUser.role,
-                        name = "${newUser.firstName} ${newUser.lastName}",
-                        email = newUser.email
-                    )
                     persistUserFcmToken(newUser.id)
                 }
 

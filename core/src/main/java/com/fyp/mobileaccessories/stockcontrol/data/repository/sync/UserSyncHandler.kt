@@ -20,6 +20,9 @@ class UserSyncHandler(
 
     fun handleSync(snapshot: DataSnapshot) {
         scope.launch {
+            if (!snapshot.exists() || !snapshot.hasChildren()) {
+                return@launch
+            }
             val remoteKeys = mutableSetOf<String>()
             val remoteIds = mutableSetOf<Int>()
 
@@ -43,6 +46,7 @@ class UserSyncHandler(
                     val fcmToken = child.child("fcmToken").getValue(String::class.java) ?: ""
 
                     if (uid.isNotBlank()) remoteKeys.add(uid)
+                    if (email.isNotBlank()) remoteKeys.add(email.lowercase())
                     if (id > 0) remoteIds.add(id)
                     remoteKeys.add(child.key ?: "")
 
@@ -72,6 +76,7 @@ class UserSyncHandler(
                 val localUsers = userDao.getAllUsersList()
                 for (localUser in localUsers) {
                     val isPresent = (localUser.uid.isNotBlank() && remoteKeys.contains(localUser.uid)) ||
+                                    (localUser.email.isNotBlank() && remoteKeys.contains(localUser.email.lowercase())) ||
                                     remoteKeys.contains(localUser.id.toString()) ||
                                     remoteIds.contains(localUser.id)
                     if (!isPresent) {
@@ -110,9 +115,8 @@ class UserSyncHandler(
             "isActive" to user.isActive,
             "fcmToken" to user.fcmToken
         )
-        // Standardize RTDB user keys to always use numeric ID (e.g. users/9)
-        // so updates always overwrite the exact same node instead of creating new keys.
-        val key = if (user.id > 0) user.id.toString() else (user.uid.ifBlank { java.util.UUID.randomUUID().toString() })
+        // Use uid as the root node key in Firebase Realtime Database
+        val key = if (user.uid.isNotBlank()) user.uid else (if (user.id > 0) user.id.toString() else java.util.UUID.randomUUID().toString())
         ref.child("users").child(key).setValue(map)
     }
 }

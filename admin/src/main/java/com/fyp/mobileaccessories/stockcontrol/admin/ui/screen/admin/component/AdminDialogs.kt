@@ -65,16 +65,24 @@ fun AddEditUserSheet(
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 AppTextField(
-                    firstName,
-                    { firstName = it },
-                    "First Name",
-                    modifier = Modifier.weight(1f)
+                    value = firstName,
+                    onValueChange = { if (it.length <= 15) firstName = it },
+                    label = "First Name",
+                    modifier = Modifier.weight(1f),
+                    maxLength = 15,
+                    showCounter = true,
+                    isError = firstName.length >= 15,
+                    errorMessage = if (firstName.length >= 15) "Max 15 chars" else ""
                 )
                 AppTextField(
-                    lastName,
-                    { lastName = it },
-                    "Last Name",
-                    modifier = Modifier.weight(1f)
+                    value = lastName,
+                    onValueChange = { if (it.length <= 15) lastName = it },
+                    label = "Last Name",
+                    modifier = Modifier.weight(1f),
+                    maxLength = 15,
+                    showCounter = true,
+                    isError = lastName.length >= 15,
+                    errorMessage = if (lastName.length >= 15) "Max 15 chars" else ""
                 )
             }
             DropdownField("Gender", gender, listOf("Male", "Female", "Other"), { gender = it })
@@ -111,7 +119,9 @@ fun AddEditUserSheet(
                 onClick = {
                     error = when {
                         firstName.isBlank() -> "First name required"
+                        firstName.length > 15 -> "First name cannot exceed 15 chars"
                         lastName.isBlank() -> "Last name required"
+                        lastName.length > 15 -> "Last name cannot exceed 15 chars"
                         email.isBlank() -> "Email required"
                         role == UserRole.MODERATOR && domain.isBlank() -> "Product domain is required"
                         user == null && password.length < 6 -> "Password must be 6+ chars"

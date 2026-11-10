@@ -26,6 +26,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -66,6 +67,7 @@ fun ManagePaymentsScreen(
 ) {
     val transactions by viewModel.transactions.collectAsStateWithLifecycle()
     val orders by viewModel.orders.collectAsStateWithLifecycle()
+    val selectedTxStatus by viewModel.txStatusFilter.collectAsStateWithLifecycle()
     var snack by remember { mutableStateOf("") }
     val snackState = remember { SnackbarHostState() }
     var remarksTarget by remember { mutableStateOf<Pair<Int, Boolean>?>(null) } // id, isApprove
@@ -97,9 +99,13 @@ fun ManagePaymentsScreen(
             ) {
                 items(statusOptions) { s ->
                     FilterChip(
-                        selected = false,
+                        selected = selectedTxStatus == s,
                         onClick = { viewModel.onTxStatusFilter(s) },
-                        label = { Text(if (s.isEmpty()) "All" else s.replace("_", " ")) }
+                        label = { Text(if (s.isEmpty()) "All" else s.replace("_", " ")) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = AppColors.Primary,
+                            selectedLabelColor = Color.White
+                        )
                     )
                 }
             }

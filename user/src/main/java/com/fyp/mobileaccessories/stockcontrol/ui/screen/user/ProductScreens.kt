@@ -106,12 +106,41 @@ fun ProductListScreen(
 
             // ── Products list ─────────────────────────────────
             if (products.isEmpty()) {
-                EmptyState(
-                    message = "No products found",
-                    icon = Icons.Default.SearchOff,
-                    action = "Clear Search",
-                    onAction = { viewModel.onProductQueryChange(""); viewModel.onCategoryChange(-1) }
-                )
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    color = AppColors.InfoContainer,
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Inventory2,
+                            contentDescription = null,
+                            tint = AppColors.Info,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Column {
+                            Text(
+                                "No products available right now",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = AppColors.Info
+                            )
+                            Text(
+                                "No accessories found matching your criteria. Check back soon!",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = AppColors.Info.copy(alpha = 0.8f)
+                            )
+                        }
+                    }
+                }
             } else {
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp),

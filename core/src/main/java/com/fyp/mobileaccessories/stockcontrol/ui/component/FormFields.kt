@@ -93,14 +93,20 @@ fun AppTextField(
     errorMessage: String = "",
     singleLine: Boolean = true,
     maxLines: Int = 1,
-    readOnly: Boolean = false
+    readOnly: Boolean = false,
+    maxLength: Int = Int.MAX_VALUE,
+    showCounter: Boolean = false
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
     Column(modifier = modifier) {
         OutlinedTextField(
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = { newValue ->
+                if (maxLength == Int.MAX_VALUE || newValue.length <= maxLength) {
+                    onValueChange(newValue)
+                }
+            },
             label = { Text(label) },
             placeholder = if (placeholder.isNotEmpty()) ({
                 Text(
@@ -143,13 +149,32 @@ fun AppTextField(
             ),
             modifier = Modifier.fillMaxWidth()
         )
-        if (isError && errorMessage.isNotEmpty()) {
-            Text(
-                text = errorMessage,
-                style = MaterialTheme.typography.bodySmall,
-                color = AppColors.Error,
-                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-            )
+        if ((isError && errorMessage.isNotEmpty()) || (showCounter && maxLength != Int.MAX_VALUE)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (isError && errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AppColors.Error,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                } else {
+                    Spacer(Modifier.width(1.dp))
+                }
+                if (showCounter && maxLength != Int.MAX_VALUE) {
+                    Text(
+                        text = "${value.length}/$maxLength",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (value.length >= maxLength) AppColors.Error else AppColors.TextTertiary
+                    )
+                }
+            }
         }
     }
 }

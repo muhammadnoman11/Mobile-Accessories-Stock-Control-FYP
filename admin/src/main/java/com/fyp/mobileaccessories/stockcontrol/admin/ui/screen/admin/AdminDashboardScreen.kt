@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.fyp.mobileaccessories.stockcontrol.admin.ui.screen.admin.component.OverviewItem
 import com.fyp.mobileaccessories.stockcontrol.admin.ui.screen.admin.component.QuickActionButton
 import com.fyp.mobileaccessories.stockcontrol.admin.ui.screen.admin.component.adminMenuItems
 import com.fyp.mobileaccessories.stockcontrol.admin.ui.screen.admin.component.greeting
@@ -91,85 +92,86 @@ fun AdminDashboardScreen(
             )
             Spacer(Modifier.height(8.dp))
 
+            val overviewItems = remember(stats, isEmployee) {
+                listOf(
+                    OverviewItem(
+                        title = "Total Users",
+                        value = stats.totalUsers.toString(),
+                        icon = Icons.Default.People,
+                        containerColor = AppColors.PrimaryContainer,
+                        contentColor = AppColors.Primary,
+                        onClick = if (!isEmployee) { { navController.navigate(Screen.ManageUsers.route) } } else null
+                    ),
+                    OverviewItem(
+                        title = "Moderators",
+                        value = stats.totalModerators.toString(),
+                        icon = Icons.Default.SupervisorAccount,
+                        containerColor = AppColors.WarningContainer,
+                        contentColor = AppColors.Warning,
+                        onClick = if (!isEmployee) { { navController.navigate(Screen.ManageModerators.route) } } else null
+                    ),
+                    OverviewItem(
+                        title = "Products",
+                        value = stats.totalProducts.toString(),
+                        icon = Icons.Default.Inventory2,
+                        containerColor = AppColors.SuccessContainer,
+                        contentColor = AppColors.Success,
+                        onClick = { navController.navigate(Screen.ManageProducts.route) }
+                    ),
+                    OverviewItem(
+                        title = "Low Stock",
+                        value = stats.lowStockCount.toString(),
+                        icon = Icons.Default.Warning,
+                        containerColor = AppColors.ErrorContainer,
+                        contentColor = AppColors.Error,
+                        onClick = { navController.navigate(Screen.StockReport.route) }
+                    ),
+                    OverviewItem(
+                        title = "Pending Orders",
+                        value = stats.pendingOrders.toString(),
+                        icon = Icons.Default.ShoppingCart,
+                        containerColor = AppColors.InfoContainer,
+                        contentColor = AppColors.Info,
+                        onClick = if (!isEmployee) { { navController.navigate(Screen.AdminOrders.route) } } else null
+                    ),
+                    OverviewItem(
+                        title = "Revenue (Rs.)",
+                        value = "%,.0f".format(stats.totalRevenue),
+                        icon = Icons.Default.AttachMoney,
+                        containerColor = AppColors.SuccessContainer,
+                        contentColor = AppColors.Success,
+                        onClick = if (!isEmployee) { { navController.navigate(Screen.ManagePayments.route) } } else null
+                    )
+                )
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        StatCard(
-                            title = "Total Users",
-                            value = stats.totalUsers.toString(),
-                            icon = Icons.Default.People,
-                            containerColor = AppColors.PrimaryContainer,
-                            contentColor = AppColors.Primary,
-                            onClick = { if (!isEmployee) navController.navigate(Screen.ManageUsers.route) }
-                        )
-                    }
-                    Box(modifier = Modifier.weight(1f)) {
-                        StatCard(
-                            title = "Moderators",
-                            value = stats.totalModerators.toString(),
-                            icon = Icons.Default.SupervisorAccount,
-                            containerColor = AppColors.WarningContainer,
-                            contentColor = AppColors.Warning,
-                            onClick = { if (!isEmployee) navController.navigate(Screen.ManageModerators.route) }
-                        )
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        StatCard(
-                            title = "Products",
-                            value = stats.totalProducts.toString(),
-                            icon = Icons.Default.Inventory2,
-                            containerColor = AppColors.SuccessContainer,
-                            contentColor = AppColors.Success,
-                            onClick = { navController.navigate(Screen.ManageProducts.route) }
-                        )
-                    }
-                    Box(modifier = Modifier.weight(1f)) {
-                        StatCard(
-                            title = "Low Stock",
-                            value = stats.lowStockCount.toString(),
-                            icon = Icons.Default.Warning,
-                            containerColor = AppColors.ErrorContainer,
-                            contentColor = AppColors.Error,
-                            onClick = { navController.navigate(Screen.StockReport.route) }
-                        )
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        StatCard(
-                            title = "Pending Orders",
-                            value = stats.pendingOrders.toString(),
-                            icon = Icons.Default.ShoppingCart,
-                            containerColor = AppColors.InfoContainer,
-                            contentColor = AppColors.Info,
-                            onClick = { if (!isEmployee) navController.navigate(Screen.AdminOrders.route) }
-                        )
-                    }
-                    Box(modifier = Modifier.weight(1f)) {
-                        StatCard(
-                            title = "Revenue (Rs.)",
-                            value = "%,.0f".format(stats.totalRevenue),
-                            icon = Icons.Default.AttachMoney,
-                            containerColor = AppColors.SuccessContainer,
-                            contentColor = AppColors.Success,
-                            onClick = { if (!isEmployee) navController.navigate(Screen.ManagePayments.route) }
-                        )
+                overviewItems.chunked(2).forEach { rowItems ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        rowItems.forEach { item ->
+                            Box(modifier = Modifier.weight(1f)) {
+                                StatCard(
+                                    title = item.title,
+                                    value = item.value,
+                                    icon = item.icon,
+                                    containerColor = item.containerColor,
+                                    contentColor = item.contentColor,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClick = item.onClick
+                                )
+                            }
+                        }
+                        repeat(2 - rowItems.size) {
+                            Spacer(Modifier.weight(1f))
+                        }
                     }
                 }
             }

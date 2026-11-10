@@ -68,6 +68,7 @@ fun RoleBadge(role: String) {
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.SemiBold,
             color = fg,
+            maxLines = 1,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
         )
     }

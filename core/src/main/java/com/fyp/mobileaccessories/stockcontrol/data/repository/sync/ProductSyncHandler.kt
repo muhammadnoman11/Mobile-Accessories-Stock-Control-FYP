@@ -16,6 +16,9 @@ class ProductSyncHandler(
 
     fun handleSync(snapshot: DataSnapshot) {
         scope.launch {
+            if (!snapshot.exists() || !snapshot.hasChildren()) {
+                return@launch
+            }
             val cloudIds = mutableSetOf<Int>()
             for (child in snapshot.children) {
                 try {
@@ -31,6 +34,8 @@ class ProductSyncHandler(
                     val addedByUserId = child.child("addedByUserId").getValue(Int::class.java)
                     val isApproved = child.child("isApproved").getValue(Boolean::class.java)
                         ?: child.child("approved").getValue(Boolean::class.java) ?: false
+                    val status = child.child("status").getValue(String::class.java)
+                        ?: if (isApproved) "APPROVED" else "PENDING"
                     val dateAdded = child.child("dateAdded").getValue(Long::class.java) ?: System.currentTimeMillis()
                     val imageUrl = child.child("imageUrl").getValue(String::class.java)?.trim() ?: ""
 
@@ -38,7 +43,7 @@ class ProductSyncHandler(
                         id = id, name = name, description = description, categoryId = categoryId,
                         subCategory = subCategory, price = price, stockQuantity = stockQuantity,
                         lowStockThreshold = lowStockThreshold, addedByUserId = addedByUserId,
-                        isApproved = isApproved, dateAdded = dateAdded, imageUrl = imageUrl
+                        isApproved = isApproved, status = status, dateAdded = dateAdded, imageUrl = imageUrl
                     )
                     productDao.insertProduct(product)
                 } catch (e: Exception) {
@@ -66,6 +71,7 @@ class ProductSyncHandler(
             "lowStockThreshold" to product.lowStockThreshold,
             "addedByUserId" to (product.addedByUserId as Any?),
             "isApproved" to product.isApproved,
+            "status" to product.status,
             "dateAdded" to product.dateAdded,
             "imageUrl" to product.imageUrl
         )

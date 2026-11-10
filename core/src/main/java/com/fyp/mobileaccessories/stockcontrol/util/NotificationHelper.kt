@@ -131,8 +131,6 @@ object NotificationHelper {
                     type = NotificationType.NORMAL
                 )
                 sender.sendToTopic(NotificationTopics.USER_NOTIFICATIONS, data)
-                sender.sendToTopic(NotificationTopics.MODERATOR_NOTIFICATIONS, data)
-                sender.sendToTopic(NotificationTopics.ADMIN_NOTIFICATIONS, data)
             } catch (e: Exception) {
                 Log.e(TAG, "Failed sending announcement notification: ${e.message}")
             }

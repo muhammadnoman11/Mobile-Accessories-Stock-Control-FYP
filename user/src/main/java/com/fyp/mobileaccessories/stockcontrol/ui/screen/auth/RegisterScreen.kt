@@ -16,8 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.fyp.mobileaccessories.stockcontrol.navigation.Screen
-import com.fyp.mobileaccessories.stockcontrol.navigation.navigateAndClear
 import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTextField
 import com.fyp.mobileaccessories.stockcontrol.ui.component.DropdownField
 import com.fyp.mobileaccessories.stockcontrol.ui.component.PrimaryButton
@@ -32,10 +30,15 @@ fun RegisterScreen(
 ) {
     val state by viewModel.registerState.collectAsStateWithLifecycle()
 
-    // After success, auto login and navigate to home screen
+    // After success, set login message and return to Login screen
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
-            navController.navigateAndClear(Screen.UserHome.route)
+            navController.previousBackStackEntry?.savedStateHandle?.set(
+                "registered_msg",
+                "Account created successfully! Please sign in with your email and password."
+            )
+            navController.previousBackStackEntry?.savedStateHandle?.set("registered_email", state.email)
+            navController.navigateUp()
         }
     }
 
@@ -111,13 +114,21 @@ fun RegisterScreen(
                     value = state.firstName,
                     onValueChange = viewModel::onRegFirstName,
                     label = "First Name",
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    maxLength = 15,
+                    showCounter = true,
+                    isError = state.firstName.length >= 15,
+                    errorMessage = if (state.firstName.length >= 15) "Max 15 chars" else ""
                 )
                 AppTextField(
                     value = state.lastName,
                     onValueChange = viewModel::onRegLastName,
                     label = "Last Name",
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    maxLength = 15,
+                    showCounter = true,
+                    isError = state.lastName.length >= 15,
+                    errorMessage = if (state.lastName.length >= 15) "Max 15 chars" else ""
                 )
             }
 
@@ -192,7 +203,7 @@ fun RegisterScreen(
             Spacer(Modifier.height(8.dp))
             PrimaryButton(
                 text = "Create Account",
-                onClick = { viewModel.register { navController.navigateUp() } },
+                onClick = { viewModel.register { } },
                 isLoading = state.isLoading,
                 icon = Icons.Default.PersonAdd
             )

@@ -35,7 +35,7 @@ import com.fyp.mobileaccessories.stockcontrol.data.local.entity.UserEntity
         AnnouncementEntity::class,
         StockMovementEntity::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

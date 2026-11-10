@@ -71,6 +71,7 @@ class ProductRepository @Inject constructor(
 
         val product = productDao.getProductById(productId)
         if (product != null) {
+            remoteSyncManager.uploadProduct(product)
             NotificationHelper.sendProductApprovalNotification(
                 productName = product.name,
                 isApproved = approved,

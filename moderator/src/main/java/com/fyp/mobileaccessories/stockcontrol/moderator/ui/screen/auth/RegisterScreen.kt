@@ -30,7 +30,14 @@ fun RegisterScreen(
     val state by viewModel.registerState.collectAsStateWithLifecycle()
 
     LaunchedEffect(state.isSuccess) {
-        if (state.isSuccess) navController.navigateUp()
+        if (state.isSuccess) {
+            navController.previousBackStackEntry?.savedStateHandle?.set(
+                "registered_msg",
+                "Moderator account created successfully! Please sign in with your email and password."
+            )
+            navController.previousBackStackEntry?.savedStateHandle?.set("registered_email", state.email)
+            navController.navigateUp()
+        }
     }
 
     Scaffold(
@@ -113,13 +120,21 @@ fun RegisterScreen(
                     value = state.firstName,
                     onValueChange = viewModel::onRegFirstName,
                     label = "First Name",
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    maxLength = 15,
+                    showCounter = true,
+                    isError = state.firstName.length >= 15,
+                    errorMessage = if (state.firstName.length >= 15) "Max 15 chars" else ""
                 )
                 AppTextField(
                     value = state.lastName,
                     onValueChange = viewModel::onRegLastName,
                     label = "Last Name",
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    maxLength = 15,
+                    showCounter = true,
+                    isError = state.lastName.length >= 15,
+                    errorMessage = if (state.lastName.length >= 15) "Max 15 chars" else ""
                 )
             }
 
@@ -207,7 +222,7 @@ fun RegisterScreen(
             Spacer(Modifier.height(8.dp))
             PrimaryButton(
                 text = "Register Moderator",
-                onClick = { viewModel.register { navController.navigateUp() } },
+                onClick = { viewModel.register { } },
                 isLoading = state.isLoading,
                 icon = Icons.Default.PersonAdd
             )

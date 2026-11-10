@@ -4,6 +4,9 @@ import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -69,18 +72,20 @@ private fun RealtimeSessionObserver(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    LaunchedEffect(session, currentRoute) {
-        if (currentRoute == Screen.Login.route ||
-            currentRoute == Screen.Register.route ||
-            currentRoute == Screen.Splash.route ||
-            currentRoute == null
-        ) {
-            return@LaunchedEffect
-        }
+    var wasSessionActive by remember { mutableStateOf(false) }
 
-        if (session == null) {
-            Toast.makeText(context, "Your account has been deleted by admin", Toast.LENGTH_LONG).show()
-            navController.navigateAndClear(Screen.Login.route)
+    LaunchedEffect(session, currentRoute) {
+        if (session != null) {
+            wasSessionActive = true
+        } else if (wasSessionActive) {
+            if (currentRoute != Screen.Login.route &&
+                currentRoute != Screen.Register.route &&
+                currentRoute != Screen.Splash.route &&
+                currentRoute != null
+            ) {
+                Toast.makeText(context, "Your account has been deleted by admin", Toast.LENGTH_LONG).show()
+                navController.navigateAndClear(Screen.Login.route)
+            }
         }
     }
 }

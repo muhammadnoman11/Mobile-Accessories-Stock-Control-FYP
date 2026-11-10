@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,6 +33,22 @@ fun LoginScreen(
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val state by viewModel.loginState.collectAsStateWithLifecycle()
+
+    val registeredMsg = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow<String?>("registered_msg", null)
+        ?.collectAsStateWithLifecycle()?.value
+
+    val registeredEmail = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow<String?>("registered_email", null)
+        ?.collectAsStateWithLifecycle()?.value
+
+    LaunchedEffect(registeredEmail) {
+        if (!registeredEmail.isNullOrBlank() && state.email.isBlank()) {
+            viewModel.onEmailChange(registeredEmail)
+        }
+    }
 
     RequestNotificationPermissionEffect()
 
@@ -114,6 +129,31 @@ fun LoginScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = AppColors.TextSecondary
                     )
+
+                    // Registration Success Message Banner
+                    if (registeredMsg != null) {
+                        Surface(
+                            color = AppColors.SuccessContainer,
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.CheckCircle, contentDescription = null,
+                                    tint = AppColors.Success, modifier = Modifier.size(16.dp)
+                                )
+                                Text(
+                                    registeredMsg, style = MaterialTheme.typography.bodySmall,
+                                    color = AppColors.Success, fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
 
                     // Error message
                     if (state.error != null) {

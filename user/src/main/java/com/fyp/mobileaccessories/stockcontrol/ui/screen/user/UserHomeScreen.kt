@@ -160,26 +160,66 @@ fun UserHomeScreen(
                 }
             }
 
-            // 2-column product grid
-            val chunked = products.take(6).chunked(2)
-            items(chunked) { row ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    row.forEach { product ->
-                        ProductGridCard(
-                            product = product,
-                            modifier = Modifier.weight(1f),
-                            onClick = {
-                                navController.navigate(Screen.ProductDetail.createRoute(product.id))
+            if (products.isEmpty()) {
+                item {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        color = AppColors.InfoContainer,
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Inventory2,
+                                contentDescription = null,
+                                tint = AppColors.Info,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Column {
+                                Text(
+                                    "No products available right now",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = AppColors.Info
+                                )
+                                Text(
+                                    "Check back soon for new accessories and updates.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = AppColors.Info.copy(alpha = 0.8f)
+                                )
                             }
-                        )
+                        }
                     }
-                    // Fill empty slot in last row
-                    if (row.size == 1) Spacer(Modifier.weight(1f))
+                }
+            } else {
+                // 2-column product grid
+                val chunked = products.take(6).chunked(2)
+                items(chunked) { row ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        row.forEach { product ->
+                            ProductGridCard(
+                                product = product,
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    navController.navigate(Screen.ProductDetail.createRoute(product.id))
+                                }
+                            )
+                        }
+                        // Fill empty slot in last row
+                        if (row.size == 1) Spacer(Modifier.weight(1f))
+                    }
                 }
             }
 
@@ -325,7 +365,7 @@ fun ProductGridCard(
                 text = product.name,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.SemiBold,
-                maxLines = 2,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
