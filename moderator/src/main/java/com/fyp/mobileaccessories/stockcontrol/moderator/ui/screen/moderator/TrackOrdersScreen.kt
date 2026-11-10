@@ -70,6 +70,7 @@ fun TrackOrdersScreen(
                             onUpdateStatus = { actionTarget = order }
                         )
                     }
+                    item { Spacer(Modifier.height(80.dp)) }
                 }
             }
         }

@@ -40,14 +40,21 @@ class OrderRepository @Inject constructor(
 
     suspend fun updateOrderStatus(orderId: Int, status: String) {
         ensureOnline("update order status")
+        val orderEntity = orderDao.getOrderById(orderId)
+        if (orderEntity?.status == "CANCELLED" && status in listOf("CONFIRMED", "DISPATCHED", "DELIVERED")) {
+            throw Exception("Cannot update a cancelled order to $status. Orders must be restored first.")
+        }
+
         orderDao.updateOrderStatus(orderId, status)
         remoteSyncManager.updateOrderStatus(orderId, status)
 
         // Automatically sync corresponding transaction status
         val tx = transactionDao.getTransactionByOrderId(orderId)
-        val orderEntity = orderDao.getOrderById(orderId)
         if (tx != null) {
-            if (status in listOf("CONFIRMED", "DISPATCHED", "DELIVERED") && tx.status == "PENDING") {
+            if (status == "DELIVERED") {
+                transactionDao.updateTransactionStatus(tx.id, "APPROVED", "Auto-approved upon successful order delivery")
+                remoteSyncManager.updateTransactionStatus(tx.id, "APPROVED", "Auto-approved upon successful order delivery")
+            } else if (status in listOf("CONFIRMED", "DISPATCHED") && tx.status == "PENDING") {
                 transactionDao.updateTransactionStatus(tx.id, "APPROVED", "Auto-approved via order status ($status)")
                 remoteSyncManager.updateTransactionStatus(tx.id, "APPROVED", "Auto-approved via order status ($status)")
             } else if (status == "CANCELLED") {

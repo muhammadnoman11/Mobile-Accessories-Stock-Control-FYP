@@ -108,6 +108,7 @@ fun ApproveProductsScreen(
                             onReject  = { rejectTarget = product }
                         )
                     }
+                    item { Spacer(Modifier.height(80.dp)) }
                 }
             }
         }

@@ -101,18 +101,15 @@ object NotificationHelper {
         scope.launch {
             try {
                 val title = if (isApproved) "Product Approved" else "Product Rejected"
-                val body = "$productName has been ${if (isApproved) "approved for store listing" else "rejected by moderator"}."
+                val body = "$productName has been ${if (isApproved) "approved for store listing" else "rejected"}."
                 val data = NotificationData(
                     title = title,
                     body = body,
                     imageUrl = imageUrl,
                     type = NotificationType.NORMAL
                 )
-                // Rejection notifications go ONLY to Admin. Approvals go to both.
+                // Product approval and rejection notifications go to Admin
                 sender.sendToTopic(NotificationTopics.ADMIN_NOTIFICATIONS, data)
-                if (isApproved) {
-                    sender.sendToTopic(NotificationTopics.MODERATOR_NOTIFICATIONS, data)
-                }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed sending product approval notification: ${e.message}")
             }

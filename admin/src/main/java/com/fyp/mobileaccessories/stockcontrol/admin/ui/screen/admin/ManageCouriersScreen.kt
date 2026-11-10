@@ -147,6 +147,7 @@ fun ManageCouriersScreen(
                         )
                     }
                 }
+                item { Spacer(Modifier.height(80.dp)) }
             }
         }
     }

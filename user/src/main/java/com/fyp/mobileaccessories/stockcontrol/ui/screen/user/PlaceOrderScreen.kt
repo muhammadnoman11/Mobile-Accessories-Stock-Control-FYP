@@ -1,5 +1,6 @@
 package com.fyp.mobileaccessories.stockcontrol.ui.screen.user
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,6 +45,7 @@ fun PlaceOrderScreen(
     val couriers by viewModel.activeCouriers.collectAsStateWithLifecycle()
     val state by viewModel.orderState.collectAsStateWithLifecycle()
     val snackState = remember { SnackbarHostState() }
+    val context = LocalContext.current.applicationContext
 
     LaunchedEffect(productId) {
         viewModel.loadProduct(productId)
@@ -51,7 +54,7 @@ fun PlaceOrderScreen(
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
-            snackState.showSnackbar("✅ Order #${state.orderId} placed successfully!")
+            Toast.makeText(context, "Order #${state.orderId} placed successfully!", Toast.LENGTH_LONG).show()
             viewModel.resetOrderState()
             navController.navigate(Screen.MyOrders.route) {
                 popUpTo(Screen.UserHome.route)

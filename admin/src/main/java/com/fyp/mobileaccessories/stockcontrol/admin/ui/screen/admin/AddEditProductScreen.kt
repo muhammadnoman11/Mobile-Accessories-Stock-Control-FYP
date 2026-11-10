@@ -275,7 +275,8 @@ fun AddEditProductScreen(
                             stockQuantity = stock.toInt(),
                             lowStockThreshold = threshold.toInt(),
                             addedByUserId = session?.userId,
-                            isApproved = isApproved
+                            isApproved = isApproved,
+                            status = if (isApproved) "APPROVED" else "PENDING"
                         )
                         viewModel.saveProduct(entity) { ok, msg ->
                             if (ok) navController.navigateUp()
