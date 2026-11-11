@@ -26,7 +26,8 @@ class AnnouncementSyncHandler(
                     val type = child.child("type").getValue(String::class.java) ?: "GENERAL"
                     val isActive = child.child("active").getValue(Boolean::class.java)
                         ?: child.child("isActive").getValue(Boolean::class.java) ?: true
-                    val dateCreated = child.child("dateCreated").getValue(Long::class.java) ?: System.currentTimeMillis()
+                    val dateCreated = child.child("dateCreated").getValue(Long::class.java)
+                        ?: System.currentTimeMillis()
 
                     val announcement = AnnouncementEntity(
                         id = id, title = title, content = content, type = type,

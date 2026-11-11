@@ -48,11 +48,6 @@ import com.fyp.mobileaccessories.stockcontrol.ui.component.ConfirmDialog
 import com.fyp.mobileaccessories.stockcontrol.ui.component.PrimaryButton
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
 
-// ============================================================
-// ManageCategoriesScreen
-// ============================================================
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageCategoriesScreen(
     navController: NavController,

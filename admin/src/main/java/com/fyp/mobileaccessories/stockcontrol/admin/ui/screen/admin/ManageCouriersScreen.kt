@@ -54,11 +54,6 @@ import com.fyp.mobileaccessories.stockcontrol.ui.component.EmptyState
 import com.fyp.mobileaccessories.stockcontrol.ui.component.PrimaryButton
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
 
-// ============================================================
-// ManageCouriersScreen
-// ============================================================
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageCouriersScreen(
     navController: NavController,

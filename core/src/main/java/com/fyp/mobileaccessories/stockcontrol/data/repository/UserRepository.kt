@@ -6,6 +6,7 @@ import com.fyp.mobileaccessories.stockcontrol.data.local.entity.UserEntity
 import com.fyp.mobileaccessories.stockcontrol.util.ConnectionDetector
 import com.fyp.mobileaccessories.stockcontrol.util.Constant
 import com.fyp.mobileaccessories.stockcontrol.util.PasswordHasher
+import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
@@ -29,10 +30,10 @@ class UserRepository @Inject constructor(
     suspend fun login(email: String, plainPassword: String): UserEntity? {
         val hashed = PasswordHasher.hash(plainPassword)
 
-        // 1. Try logging in locally via Room cache (case-insensitive email, supporting both hashed and plain text passwords)
+        /** 1. Try logging in locally via Room cache (case-insensitive email, supporting both hashed and plain text passwords) */
         var user = userDao.login(email, hashed, plainPassword)
 
-        // 2. If not found locally, check Realtime Database if online
+        /** 2. If not found locally, check Realtime Database if online */
         if (user == null && ConnectionDetector.isConnected(context)) {
             val cloudUser = fetchUserFromFirebase(email)
             if (cloudUser != null) {
@@ -66,9 +67,9 @@ class UserRepository @Inject constructor(
         return try {
             val fallbackUrl = Constant.DATABASE_URL
             val db = try {
-                com.google.firebase.database.FirebaseDatabase.getInstance()
+                FirebaseDatabase.getInstance()
             } catch (_: Exception) {
-                com.google.firebase.database.FirebaseDatabase.getInstance(fallbackUrl)
+                FirebaseDatabase.getInstance(fallbackUrl)
             }
             val snapshot = db.reference.child("users").get().await()
             for (child in snapshot.children) {

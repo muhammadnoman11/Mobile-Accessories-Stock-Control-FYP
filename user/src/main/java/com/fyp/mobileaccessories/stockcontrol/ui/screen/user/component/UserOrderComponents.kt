@@ -23,7 +23,6 @@ import com.fyp.mobileaccessories.stockcontrol.ui.component.ProductImage
 import com.fyp.mobileaccessories.stockcontrol.ui.component.StatusBadge
 import com.fyp.mobileaccessories.stockcontrol.ui.screen.user.UserViewModel
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-import com.fyp.mobileaccessories.stockcontrol.util.DateUtils
 import com.fyp.mobileaccessories.stockcontrol.util.PaymentMode
 
 @Composable

@@ -30,11 +30,13 @@ class CategoryRepository @Inject constructor(
         remoteSyncManager.uploadCategory(categoryWithId)
         return id
     }
+
     suspend fun updateCategory(category: CategoryEntity) {
         ensureOnline("update category")
         categoryDao.updateCategory(category)
         remoteSyncManager.uploadCategory(category)
     }
+
     suspend fun deleteCategory(category: CategoryEntity) {
         ensureOnline("delete category")
         categoryDao.deleteCategory(category)

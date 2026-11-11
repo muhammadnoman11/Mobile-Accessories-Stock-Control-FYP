@@ -47,7 +47,7 @@ fun AdminNavigation(
         navController = navController,
         startDestination = startDestination
     ) {
-        // ── AUTH ──────────────────────────────────
+        /** Authentication */
         composable(Screen.Splash.route) {
             SplashScreen(navController = navController)
         }
@@ -58,7 +58,7 @@ fun AdminNavigation(
             RegisterScreen(navController = navController)
         }
 
-        // ── ADMIN ─────────────────────────────────
+        /** Admin */
         composable(Screen.AdminDashboard.route) {
             AdminDashboardScreen(navController = navController)
         }
@@ -131,7 +131,7 @@ private fun RealtimeSessionObserver(navController: NavHostController) {
     }
 }
 
-// Helper extension to navigate and clear back stack
+/** Helper extension to navigate and clear back stack */
 fun NavController.navigateAndClear(route: String) {
     navigate(route) {
         popUpTo(0) { inclusive = true }

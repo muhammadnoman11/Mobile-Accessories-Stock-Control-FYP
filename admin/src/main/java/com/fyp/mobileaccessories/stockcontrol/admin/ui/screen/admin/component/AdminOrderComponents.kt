@@ -20,7 +20,6 @@ import com.fyp.mobileaccessories.stockcontrol.data.local.entity.UserEntity
 import com.fyp.mobileaccessories.stockcontrol.ui.component.ProductImage
 import com.fyp.mobileaccessories.stockcontrol.ui.component.StatusBadge
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-import com.fyp.mobileaccessories.stockcontrol.util.DateUtils
 import com.fyp.mobileaccessories.stockcontrol.util.OrderStatus
 import com.fyp.mobileaccessories.stockcontrol.util.PaymentMode
 

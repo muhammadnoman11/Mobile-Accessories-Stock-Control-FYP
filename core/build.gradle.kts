@@ -67,9 +67,6 @@ dependencies {
     // DataStore (session persistence)
     implementation(libs.androidx.datastore.preferences)
 
-    // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
     // Firebase
     implementation(platform(libs.firebase.bom))

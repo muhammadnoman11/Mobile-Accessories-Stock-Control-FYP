@@ -1,6 +1,5 @@
 package com.fyp.mobileaccessories.stockcontrol.ui.screen.user
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -25,16 +24,9 @@ import androidx.navigation.NavController
 import com.fyp.mobileaccessories.stockcontrol.data.local.entity.ProductEntity
 import com.fyp.mobileaccessories.stockcontrol.navigation.Screen
 import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTopBar
-import com.fyp.mobileaccessories.stockcontrol.ui.component.EmptyState
 import com.fyp.mobileaccessories.stockcontrol.ui.component.ProductImage
 import com.fyp.mobileaccessories.stockcontrol.ui.component.SearchBar
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-
-// ============================================================
-// FILE: presentation/user/ProductListScreen.kt
-// Full product catalogue — search by name/description,
-// filter by category chip, tap a product to view details.
-// ============================================================
 
 @Composable
 fun ProductListScreen(
@@ -63,7 +55,7 @@ fun ProductListScreen(
                 .padding(padding)
         ) {
             com.fyp.mobileaccessories.stockcontrol.ui.component.OfflineBanner(isOffline = !isOnline)
-            // ── Search bar ────────────────────────────────────
+            /** Search bar */
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                 SearchBar(
                     query = query,
@@ -72,7 +64,7 @@ fun ProductListScreen(
                 )
             }
 
-            // ── Category filter chips ─────────────────────────
+            /** Category filter chips */
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -104,7 +96,7 @@ fun ProductListScreen(
             Spacer(Modifier.height(8.dp))
             HorizontalDivider(color = AppColors.Divider)
 
-            // ── Products list ─────────────────────────────────
+            /** Products list */
             if (products.isEmpty()) {
                 Surface(
                     modifier = Modifier
@@ -165,7 +157,7 @@ fun ProductListScreen(
     }
 }
 
-// ── Horizontal product card for the list ─────────────────────
+/** Horizontal product card for the list */
 @Composable
 private fun ProductListCard(product: ProductEntity, onClick: () -> Unit) {
     val isOutOfStock = product.stockQuantity == 0
@@ -182,7 +174,7 @@ private fun ProductListCard(product: ProductEntity, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // Product image
+            /** Product image */
             Box(
                 modifier = Modifier
                     .size(72.dp)
@@ -214,7 +206,7 @@ private fun ProductListCard(product: ProductEntity, onClick: () -> Unit) {
                     maxLines = 2, overflow = TextOverflow.Ellipsis
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    // Stock status badge
+                    /** Stock status badge */
                     Surface(
                         color = when {
                             isOutOfStock -> AppColors.ErrorContainer
@@ -250,12 +242,6 @@ private fun ProductListCard(product: ProductEntity, onClick: () -> Unit) {
         }
     }
 }
-
-// ============================================================
-// FILE: presentation/user/ProductDetailScreen.kt
-// Full product detail view — description, price, stock,
-// quantity selector, and "Place Order" button.
-// ============================================================
 
 @Composable
 fun ProductDetailScreen(
@@ -293,7 +279,7 @@ fun ProductDetailScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
         ) {
-            // ── Product Image Header Banner ───────────────────
+            /** Product Image Header Banner */
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -306,7 +292,7 @@ fun ProductDetailScreen(
                     modifier = Modifier.fillMaxSize(),
                     iconSize = 80.dp
                 )
-                // Out of stock overlay
+                /** Out of stock overlay */
                 if (isOutOfStock) {
                     Surface(
                         color = AppColors.ErrorContainer.copy(alpha = 0.9f),
@@ -330,7 +316,7 @@ fun ProductDetailScreen(
                 modifier = Modifier.padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Name + Price row
+                /** Name + Price row */
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -350,7 +336,7 @@ fun ProductDetailScreen(
                     )
                 }
 
-                // Sub-category if available
+                /** Sub-category if available */
                 if (p.subCategory.isNotBlank()) {
                     Surface(color = AppColors.PrimaryContainer, shape = RoundedCornerShape(20.dp)) {
                         Text(
@@ -363,7 +349,7 @@ fun ProductDetailScreen(
 
                 HorizontalDivider(color = AppColors.Divider)
 
-                // Description
+                /** Description */
                 Text(
                     "About this product",
                     style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold
@@ -375,7 +361,7 @@ fun ProductDetailScreen(
 
                 HorizontalDivider(color = AppColors.Divider)
 
-                // Stock info
+                /** Stock info */
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -393,7 +379,7 @@ fun ProductDetailScreen(
 
                 Spacer(Modifier.height(8.dp))
 
-                // ── Action button ─────────────────────────────
+                /** Action button */
                 Button(
                     onClick = { navController.navigate(Screen.PlaceOrder.createRoute(p.id)) },
                     enabled = !isOutOfStock,

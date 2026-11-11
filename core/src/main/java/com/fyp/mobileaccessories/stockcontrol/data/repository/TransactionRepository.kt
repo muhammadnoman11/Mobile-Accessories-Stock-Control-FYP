@@ -43,7 +43,10 @@ class TransactionRepository @Inject constructor(
             val product = productDao.getProductById(order.productId)
             val fcmToken = userRepository.getUserFcmToken(order.userId)
             if (fcmToken.isBlank()) {
-                Log.w("FCM_TOKEN", "No FCM token for user ${order.userId}; transaction notification skipped")
+                Log.w(
+                    "FCM_TOKEN",
+                    "No FCM token for user ${order.userId}; transaction notification skipped"
+                )
             }
 
             if (status == "APPROVED") {
@@ -56,7 +59,12 @@ class TransactionRepository @Inject constructor(
                 } else {
                     "Your Order #${order.id} is now CONFIRMED"
                 }
-                NotificationHelper.sendNotificationToUserDevice(fcmToken, title, body, product?.imageUrl ?: "")
+                NotificationHelper.sendNotificationToUserDevice(
+                    fcmToken,
+                    title,
+                    body,
+                    product?.imageUrl ?: ""
+                )
             } else if (status == "REJECTED") {
                 orderDao.updateOrderStatus(order.id, "CANCELLED")
                 remoteSyncManager.updateOrderStatus(order.id, "CANCELLED")
@@ -73,7 +81,12 @@ class TransactionRepository @Inject constructor(
                 } else {
                     "Your Order #${order.id} is now CANCELLED"
                 }
-                NotificationHelper.sendNotificationToUserDevice(fcmToken, title, body, product?.imageUrl ?: "")
+                NotificationHelper.sendNotificationToUserDevice(
+                    fcmToken,
+                    title,
+                    body,
+                    product?.imageUrl ?: ""
+                )
             }
         }
     }

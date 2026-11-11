@@ -14,33 +14,6 @@ object NotificationHelper {
     private val sender = EasyNotificationSender()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    fun sendOrderStatusNotification(
-        orderId: Int,
-        status: String,
-        productName: String = "",
-        imageUrl: String = ""
-    ) {
-        scope.launch {
-            try {
-                val title = "Order Status Update"
-                val body = if (productName.isNotBlank()) {
-                    "Your Order #$orderId ($productName) is now $status"
-                } else {
-                    "Your Order #$orderId is now $status"
-                }
-                val data = NotificationData(
-                    title = title,
-                    body = body,
-                    imageUrl = imageUrl,
-                    type = NotificationType.NORMAL
-                )
-                sender.sendToTopic(NotificationTopics.ADMIN_NOTIFICATIONS, data)
-                sender.sendToTopic(NotificationTopics.MODERATOR_NOTIFICATIONS, data)
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed sending order status notification: ${e.message}")
-            }
-        }
-    }
 
     fun sendNewOrderNotification(
         orderId: Int,
@@ -108,7 +81,6 @@ object NotificationHelper {
                     imageUrl = imageUrl,
                     type = NotificationType.NORMAL
                 )
-                // Product approval and rejection notifications go to Admin
                 sender.sendToTopic(NotificationTopics.ADMIN_NOTIFICATIONS, data)
             } catch (e: Exception) {
                 Log.e(TAG, "Failed sending product approval notification: ${e.message}")

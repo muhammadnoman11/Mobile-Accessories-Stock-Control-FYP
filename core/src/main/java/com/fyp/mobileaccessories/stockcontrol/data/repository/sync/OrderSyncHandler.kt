@@ -27,18 +27,30 @@ class OrderSyncHandler(
                     val totalAmount = child.child("totalAmount").getValue(Double::class.java) ?: 0.0
                     val courierId = child.child("courierId").getValue(Int::class.java)
                     val paymentCompanyId = child.child("paymentCompanyId").getValue(Int::class.java)
-                    val paymentMode = child.child("paymentMode").getValue(String::class.java) ?: "COD"
+                    val paymentMode =
+                        child.child("paymentMode").getValue(String::class.java) ?: "COD"
                     val status = child.child("status").getValue(String::class.java) ?: "PENDING"
-                    val deliveryAddress = child.child("deliveryAddress").getValue(String::class.java) ?: ""
+                    val deliveryAddress =
+                        child.child("deliveryAddress").getValue(String::class.java) ?: ""
                     val notes = child.child("notes").getValue(String::class.java) ?: ""
-                    val orderDate = child.child("orderDate").getValue(Long::class.java) ?: System.currentTimeMillis()
+                    val orderDate = child.child("orderDate").getValue(Long::class.java)
+                        ?: System.currentTimeMillis()
                     val deliveryDate = child.child("deliveryDate").getValue(Long::class.java)
 
                     val order = OrderEntity(
-                        id = id, userId = userId, productId = productId, quantity = quantity,
-                        totalAmount = totalAmount, courierId = courierId, paymentCompanyId = paymentCompanyId,
-                        paymentMode = paymentMode, status = status, deliveryAddress = deliveryAddress,
-                        notes = notes, orderDate = orderDate, deliveryDate = deliveryDate
+                        id = id,
+                        userId = userId,
+                        productId = productId,
+                        quantity = quantity,
+                        totalAmount = totalAmount,
+                        courierId = courierId,
+                        paymentCompanyId = paymentCompanyId,
+                        paymentMode = paymentMode,
+                        status = status,
+                        deliveryAddress = deliveryAddress,
+                        notes = notes,
+                        orderDate = orderDate,
+                        deliveryDate = deliveryDate
                     )
                     orderDao.insertOrder(order)
                 } catch (e: Exception) {

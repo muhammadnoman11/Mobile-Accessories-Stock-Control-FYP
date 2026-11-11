@@ -52,13 +52,13 @@ fun LoginScreen(
 
     RequestNotificationPermissionEffect()
 
-    // After successful login, navigate to the correct role dashboard
+    /** After successful login, navigate to the correct role dashboard */
     fun onLoginSuccess(role: String) {
         navController.navigateAndClear(Screen.UserHome.route)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Top gradient header
+        /** Top gradient header */
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -78,7 +78,7 @@ fun LoginScreen(
         ) {
             Spacer(Modifier.height(48.dp))
 
-            // App Icon
+            /** App Icon */
             Box(
                 modifier = Modifier
                     .size(100.dp)
@@ -105,7 +105,7 @@ fun LoginScreen(
 
             Spacer(Modifier.height(40.dp))
 
-            // ── Login Card ────────────────────────────────────
+            /** Login Card */
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -130,7 +130,7 @@ fun LoginScreen(
                         color = AppColors.TextSecondary
                     )
 
-                    // Registration Success Message Banner
+                    /** Registration Success Message Banner */
                     if (registeredMsg != null) {
                         Surface(
                             color = AppColors.SuccessContainer,
@@ -155,7 +155,7 @@ fun LoginScreen(
                         }
                     }
 
-                    // Error message
+                    /** Error message */
                     if (state.error != null) {
                         Surface(
                             color = AppColors.ErrorContainer,
@@ -180,7 +180,7 @@ fun LoginScreen(
                         }
                     }
 
-                    // Email field
+                    /** Email field */
                     AppTextField(
                         value = state.email,
                         onValueChange = viewModel::onEmailChange,
@@ -190,7 +190,7 @@ fun LoginScreen(
                         isError = state.error != null
                     )
 
-                    // Password field
+                    /** Password field */
                     AppTextField(
                         value = state.password,
                         onValueChange = viewModel::onPasswordChange,
@@ -200,7 +200,7 @@ fun LoginScreen(
                         isError = state.error != null
                     )
 
-                    // Login button
+                    /** Login button */
                     PrimaryButton(
                         text = "Sign In",
                         onClick = { viewModel.login(::onLoginSuccess) },
@@ -212,7 +212,7 @@ fun LoginScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Register link
+            /** Register link */
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center

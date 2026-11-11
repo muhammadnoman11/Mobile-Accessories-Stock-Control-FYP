@@ -39,7 +39,10 @@ class CategorySyncHandler(
                 for (local in localCategories) {
                     if (local.id !in cloudIds) {
                         categoryDao.deleteCategory(local)
-                        Log.d(TAG, "Deleted local category ${local.name} as it was removed from Realtime Database.")
+                        Log.d(
+                            TAG,
+                            "Deleted local category ${local.name} as it was removed from Realtime Database."
+                        )
                     }
                 }
             } catch (e: Exception) {

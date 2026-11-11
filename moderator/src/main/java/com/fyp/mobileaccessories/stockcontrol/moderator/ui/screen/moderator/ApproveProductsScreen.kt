@@ -54,31 +54,29 @@ import com.fyp.mobileaccessories.stockcontrol.ui.component.OfflineBanner
 import com.fyp.mobileaccessories.stockcontrol.ui.component.ProductImage
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
 
-// ============================================================
-// ApproveProductsScreen
-// ============================================================
-
 @Composable
 fun ApproveProductsScreen(
     navController: NavController,
     viewModel: ModViewModel = hiltViewModel()
 ) {
-    val products    by viewModel.pendingProducts.collectAsStateWithLifecycle()
-    val isOnline    by viewModel.isOnline.collectAsStateWithLifecycle()
-    var snack       by remember { mutableStateOf("") }
-    val snackState  = remember { SnackbarHostState() }
+    val products by viewModel.pendingProducts.collectAsStateWithLifecycle()
+    val isOnline by viewModel.isOnline.collectAsStateWithLifecycle()
+    var snack by remember { mutableStateOf("") }
+    val snackState = remember { SnackbarHostState() }
     var rejectTarget by remember { mutableStateOf<ProductEntity?>(null) }
 
     LaunchedEffect(snack) {
-        if (snack.isNotBlank()) { snackState.showSnackbar(snack); snack = "" }
+        if (snack.isNotBlank()) {
+            snackState.showSnackbar(snack); snack = ""
+        }
     }
 
     Scaffold(
         topBar = {
             AppTopBar(
-                title    = "Product Approvals",
+                title = "Product Approvals",
                 subtitle = "${products.size} pending",
-                onBack   = { navController.navigateUp() }
+                onBack = { navController.navigateUp() }
             )
         },
         snackbarHost = { SnackbarHost(snackState) }
@@ -89,7 +87,7 @@ fun ApproveProductsScreen(
                 Box(Modifier.fillMaxSize()) {
                     EmptyState(
                         message = "No products awaiting approval",
-                        icon    = Icons.Default.CheckCircle
+                        icon = Icons.Default.CheckCircle
                     )
                 }
             } else {
@@ -99,13 +97,13 @@ fun ApproveProductsScreen(
                 ) {
                     items(products, key = { it.id }) { product ->
                         PendingProductCard(
-                            product   = product,
+                            product = product,
                             onApprove = {
                                 viewModel.approveProduct(product.id) { ok, msg ->
                                     snack = if (ok) "✅ ${product.name} approved" else msg
                                 }
                             },
-                            onReject  = { rejectTarget = product }
+                            onReject = { rejectTarget = product }
                         )
                     }
                     item { Spacer(Modifier.height(80.dp)) }
@@ -114,7 +112,7 @@ fun ApproveProductsScreen(
         }
     }
 
-    // Rejection reason dialog (TC-08-03)
+    /** Rejection reason dialog (TC-08-03) */
     rejectTarget?.let { target ->
         var reason by remember { mutableStateOf("") }
         AlertDialog(
@@ -122,7 +120,10 @@ fun ApproveProductsScreen(
             title = { Text("Reject '${target.name}'?", fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Provide a reason for rejection (TC-08-03):", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        "Provide a reason for rejection (TC-08-03):",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                     OutlinedTextField(
                         value = reason,
                         onValueChange = { reason = it },
@@ -161,7 +162,10 @@ private fun PendingProductCard(
         colors = CardDefaults.cardColors(Color.White),
         elevation = CardDefaults.cardElevation(3.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -180,26 +184,40 @@ private fun PendingProductCard(
                     )
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(product.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                    Text(product.description, style = MaterialTheme.typography.bodySmall, color = AppColors.TextSecondary)
+                    Text(
+                        product.name,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        product.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AppColors.TextSecondary
+                    )
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Surface(color = AppColors.InfoContainer, shape = RoundedCornerShape(20.dp)) {
-                    Text("Rs. ${"%,.0f".format(product.price)}", color = AppColors.Info,
+                    Text(
+                        "Rs. ${"%,.0f".format(product.price)}", color = AppColors.Info,
                         style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                    )
                 }
                 Surface(color = AppColors.PrimaryContainer, shape = RoundedCornerShape(20.dp)) {
-                    Text("Stock: ${product.stockQuantity}", color = AppColors.Primary,
+                    Text(
+                        "Stock: ${product.stockQuantity}", color = AppColors.Primary,
                         style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                    )
                 }
                 if (product.subCategory.isNotBlank()) {
                     Surface(color = AppColors.SurfaceVariant, shape = RoundedCornerShape(20.dp)) {
-                        Text(product.subCategory, color = AppColors.TextSecondary,
+                        Text(
+                            product.subCategory, color = AppColors.TextSecondary,
                             style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                        )
                     }
                 }
             }
@@ -212,8 +230,10 @@ private fun PendingProductCard(
                     Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(4.dp)); Text("Approve")
                 }
-                OutlinedButton(onClick = onReject, modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Error)) {
+                OutlinedButton(
+                    onClick = onReject, modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Error)
+                ) {
                     Icon(Icons.Default.Cancel, null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(4.dp)); Text("Reject")
                 }

@@ -53,12 +53,7 @@ import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTopBar
 import com.fyp.mobileaccessories.stockcontrol.ui.component.EmptyState
 import com.fyp.mobileaccessories.stockcontrol.ui.component.StatusBadge
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-import com.fyp.mobileaccessories.stockcontrol.util.DateUtils
 import com.fyp.mobileaccessories.stockcontrol.util.PaymentMode
-
-// ============================================================
-// FILE: ManagePaymentsScreen.kt — Transactions / mock payments & refunds
-// ============================================================
 
 @Composable
 fun ManagePaymentsScreen(
@@ -140,7 +135,7 @@ fun ManagePaymentsScreen(
         }
     }
 
-    // Remarks dialog for approve/reject
+    /** Remarks dialog for approve/reject */
     remarksTarget?.let { (txId, isApprove) ->
         RemarksDialog(
             title = if (isApprove) "Approve Transaction" else "Reject Transaction",
@@ -157,7 +152,7 @@ fun ManagePaymentsScreen(
         )
     }
 
-    // Refund Dialog
+    /** Refund Dialog */
     refundTarget?.let { txId ->
         RemarksDialog(
             title = "Process Refund",

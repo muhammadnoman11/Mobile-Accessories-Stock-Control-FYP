@@ -1,6 +1,5 @@
 package com.fyp.mobileaccessories.stockcontrol.ui.screen.user.component
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -19,9 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.fyp.mobileaccessories.stockcontrol.data.local.entity.AnnouncementEntity
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-import com.fyp.mobileaccessories.stockcontrol.util.DateUtils
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AnnouncementsCarousel(announcements: List<AnnouncementEntity>) {
     val pagerState = rememberPagerState { announcements.size }
@@ -79,6 +76,8 @@ fun AnnouncementsCarousel(announcements: List<AnnouncementEntity>) {
                 }
             }
         }
+
+        /** Pager dots indicator */
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -101,3 +100,4 @@ fun AnnouncementsCarousel(announcements: List<AnnouncementEntity>) {
         }
     }
 }
+

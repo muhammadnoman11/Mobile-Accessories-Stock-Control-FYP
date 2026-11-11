@@ -28,15 +28,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// ============================================================
-// FILE: presentation/admin/AdminViewModel.kt
-// Central ViewModel for all Admin screens.
-// Provides: dashboard stats, user CRUD, product CRUD,
-// order management, payment management, courier CRUD,
-// announcements CRUD, category CRUD, stock reports.
-// ============================================================
-
-// ── Dashboard stats ───────────────────────────────────────────
+/** Dashboard stats data class */
 data class DashboardStats(
     val totalUsers: Int = 0,
     val totalModerators: Int = 0,
@@ -63,17 +55,15 @@ class AdminViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    // ── Real-time Connectivity ──────────────────────────────
+    /** Real-time Connectivity */
     val isOnline: StateFlow<Boolean> = ConnectionDetector.observeConnectivity(context)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ConnectionDetector.isConnected(context))
 
-    // ── Session info ──────────────────────────────────────────
+    /** Session info */
     val session = sessionManager.sessionFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    // ──────────────────────────────────────────────────────────
-    // DASHBOARD STATS
-    // ──────────────────────────────────────────────────────────
+    /** Dashboard stats */
     val stats: StateFlow<DashboardStats> = combine(
         userRepo.getAllUsers(),
         productRepo.getAllProducts(),
@@ -94,12 +84,10 @@ class AdminViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DashboardStats())
 
     fun loadDashboardStats() {
-        // Reactive stream automatically handles loading and updates
+        /** Reactive stream automatically handles loading and updates */
     }
 
-    // ──────────────────────────────────────────────────────────
-    // USERS
-    // ──────────────────────────────────────────────────────────
+    /** Users management */
     private val _userSearchQuery = MutableStateFlow("")
     private val _userRoleFilter = MutableStateFlow("")  // "" = all roles
     private val _userDomainFilter = MutableStateFlow("") // moderator domain filter
@@ -109,7 +97,7 @@ class AdminViewModel @Inject constructor(
     val userRoleFilter = _userRoleFilter.asStateFlow()
     val userDomainFilter = _userDomainFilter.asStateFlow()
 
-    // Live search — updates automatically when query, role, domain, or date filter changes
+    /** Live search  updates automatically when query, role, domain, or date filter changes */
     @OptIn(ExperimentalCoroutinesApi::class)
     val users: StateFlow<List<UserEntity>> = combine(
         _userSearchQuery, _userRoleFilter, _userDomainFilter, _userFromDateFilter
@@ -123,7 +111,7 @@ class AdminViewModel @Inject constructor(
     fun onUserDomainFilter(domain: String) = _userDomainFilter.update { domain }
     fun onUserFromDateFilter(dateMs: Long) = _userFromDateFilter.update { dateMs }
 
-    // Add / Update user
+    /** Add / Update user */
     fun saveUser(user: UserEntity, plainPassword: String = "", onDone: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             if (!ConnectionDetector.isConnected(context)) {
@@ -159,9 +147,7 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    // ──────────────────────────────────────────────────────────
-    // PRODUCTS
-    // ──────────────────────────────────────────────────────────
+    /** Products management */
     private val _productQuery = MutableStateFlow("")
     private val _productCategory = MutableStateFlow(-1)
 
@@ -211,9 +197,7 @@ class AdminViewModel @Inject constructor(
     suspend fun getProductById(id: Int): ProductEntity? = productRepo.getProductById(id)
     suspend fun getUserById(id: Int): UserEntity? = userRepo.getUserById(id)
 
-    // ──────────────────────────────────────────────────────────
-    // CATEGORIES
-    // ──────────────────────────────────────────────────────────
+    /** Categories management */
     val categories: StateFlow<List<CategoryEntity>> = categoryRepo.getAllCategories()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
@@ -240,9 +224,7 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    // ──────────────────────────────────────────────────────────
-    // COURIERS
-    // ──────────────────────────────────────────────────────────
+    /** Couriers management */
     val couriers: StateFlow<List<CourierEntity>> = courierRepo.getAllCouriers()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
@@ -269,9 +251,7 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    // ──────────────────────────────────────────────────────────
-    // ORDERS
-    // ──────────────────────────────────────────────────────────
+    /** Orders management */
     private val _orderStatusFilter = MutableStateFlow("")
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -288,9 +268,7 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    // ──────────────────────────────────────────────────────────
-    // TRANSACTIONS (PAYMENTS)
-    // ──────────────────────────────────────────────────────────
+    /** Transactions and Payments */
     private val _txStatusFilter = MutableStateFlow("")
     val txStatusFilter = _txStatusFilter.asStateFlow()
     private val _txPayModeFilter = MutableStateFlow("")
@@ -330,9 +308,7 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    // ──────────────────────────────────────────────────────────
-    // ANNOUNCEMENTS
-    // ──────────────────────────────────────────────────────────
+    /** Announcements management */
     private val _annTypeFilter = MutableStateFlow("")
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -365,15 +341,11 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    // ──────────────────────────────────────────────────────────
-    // STOCK MOVEMENTS (for stock report)
-    // ──────────────────────────────────────────────────────────
+    /** Stock Movements */
     val recentStockMovements = stockMoveRepo.getRecentMovements(100)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    // ──────────────────────────────────────────────────────────
-    // ADJUST STOCK MANUALLY
-    // ──────────────────────────────────────────────────────────
+    /** Adjust Stock Manually */
     fun adjustStock(
         product: ProductEntity,
         newQty: Int,
@@ -395,9 +367,7 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    // ──────────────────────────────────────────────────────────
-    // ADMIN LOGOUT
-    // ──────────────────────────────────────────────────────────
+    /** Admin Logout */
     fun logout(onLogout: () -> Unit) {
         viewModelScope.launch {
             sessionManager.clearSession()

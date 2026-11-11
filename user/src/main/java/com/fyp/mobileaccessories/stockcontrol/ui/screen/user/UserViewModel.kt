@@ -27,14 +27,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// ============================================================
-// FILE: presentation/user/UserViewModel.kt
-// ViewModel for all User (Customer) screens.
-// Handles: product browsing/search, placing orders,
-// viewing own orders and transactions, profile management.
-// ============================================================
-
-// ── UI state for PlaceOrderScreen ─────────────────────────────
+/** Place Order UI State */
 data class PlaceOrderUiState(
     val selectedCourierId: Int? = null,
     val paymentMode: String = "CASH_ON_DELIVERY",
@@ -60,15 +53,15 @@ class UserViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    // ── Real-time Connectivity ──────────────────────────────
+    /** Real-time Connectivity */
     val isOnline: StateFlow<Boolean> = ConnectionDetector.observeConnectivity(context)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ConnectionDetector.isConnected(context))
 
-    // ── Session ───────────────────────────────────────────────
+    /** Session */
     val session = sessionManager.sessionFlow
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    // ── User Profile (Reactive) ──────────────────────────────
+    /** User Profile */
     @OptIn(ExperimentalCoroutinesApi::class)
     val userProfile: StateFlow<UserEntity?> = sessionManager.sessionFlow
         .flatMapLatest { session ->
@@ -80,9 +73,7 @@ class UserViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    // ──────────────────────────────────────────────────────────
-    // PRODUCTS — search + category filter (only approved)
-    // ──────────────────────────────────────────────────────────
+    /** Products - Search and Category Filter */
     private val _productQuery = MutableStateFlow("")
     private val _productCategory = MutableStateFlow(-1)  // -1 = all categories
 
@@ -94,7 +85,7 @@ class UserViewModel @Inject constructor(
         _productQuery, _productCategory
     ) { q, c -> Pair(q, c) }
         .flatMapLatest { (q, c) ->
-            // Only show approved products to customers
+            /** Only show approved products to customers */
             productRepo.searchProducts(q, c, onlyApproved = true)
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -102,11 +93,11 @@ class UserViewModel @Inject constructor(
     fun onProductQueryChange(q: String) = _productQuery.update { q }
     fun onCategoryChange(id: Int) = _productCategory.update { id }
 
-    // Categories list for filter chips
+    /** Categories list for filter chips */
     val categories: StateFlow<List<CategoryEntity>> = categoryRepo.getAllCategories()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    // Get a single product by ID (for ProductDetailScreen)
+    /** Get a single product by ID (for ProductDetailScreen) */
     private val _selectedProduct = MutableStateFlow<ProductEntity?>(null)
     val selectedProduct = _selectedProduct.asStateFlow()
 
@@ -118,19 +109,15 @@ class UserViewModel @Inject constructor(
 
     suspend fun getProductById(id: Int) = productRepo.getProductById(id)
 
-    // ──────────────────────────────────────────────────────────
-    // COURIERS — for PlaceOrderScreen dropdown
-    // ──────────────────────────────────────────────────────────
+    /** Active Couriers */
     val activeCouriers: StateFlow<List<CourierEntity>> = courierRepo.getActiveCouriers()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    // ──────────────────────────────────────────────────────────
-    // PLACE ORDER
-    // ──────────────────────────────────────────────────────────
+    /** Place Order */
     private val _orderState = MutableStateFlow(PlaceOrderUiState())
     val orderState = _orderState.asStateFlow()
 
-    // Field setters for PlaceOrderScreen
+    /** Field setters for PlaceOrderScreen */
     fun onCourierSelect(id: Int) =
         _orderState.update { it.copy(selectedCourierId = id, error = null) }
 
@@ -145,7 +132,7 @@ class UserViewModel @Inject constructor(
 
     fun onNotesChange(notes: String) = _orderState.update { it.copy(notes = notes) }
 
-    // Populate delivery address from user profile
+    /** Populate delivery address from user profile */
     fun prefillAddress() {
         viewModelScope.launch {
             val activeSession = sessionManager.sessionFlow.first() ?: return@launch
@@ -171,7 +158,7 @@ class UserViewModel @Inject constructor(
             }
             val userId = activeSession.userId
 
-            // Validate before placing
+            /** Validate before placing */
             val error = when {
                 s.quantity < 1 -> "Quantity must be at least 1"
                 s.quantity > product.stockQuantity ->
@@ -221,12 +208,11 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    // Reset order form after success or when leaving the screen
+    /** Reset order form after success or when leaving the screen */
     fun resetOrderState() = _orderState.update { PlaceOrderUiState() }
 
-    // ──────────────────────────────────────────────────────────
-    // MY ORDERS + TRANSACTIONS
-    // ──────────────────────────────────────────────────────────
+
+    /** My Orders and Transactions */
     @OptIn(ExperimentalCoroutinesApi::class)
     val myOrders: StateFlow<List<OrderEntity>> = session
         .filterNotNull()
@@ -239,9 +225,7 @@ class UserViewModel @Inject constructor(
         .flatMapLatest { transactionRepo.getTransactionsByUser(it.userId) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    // ──────────────────────────────────────────────────────────
-    // ANNOUNCEMENTS — active ones shown to users
-    // ──────────────────────────────────────────────────────────
+    /** Active Announcements */
     val welcomeAnnouncements: StateFlow<List<AnnouncementEntity>> =
         announcementRepo.getActiveAnnouncements()
             .map { list -> list.filter { it.type == "WELCOME" } }
@@ -252,10 +236,7 @@ class UserViewModel @Inject constructor(
             .map { list -> list.filter { it.type != "WELCOME" } }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    // ──────────────────────────────────────────────────────────
-    // USER PROFILE
-    // ──────────────────────────────────────────────────────────
-    // ── USER PROFILE (Reactive) ───────────────────────────────
+    /** User Profile */
     @OptIn(ExperimentalCoroutinesApi::class)
     val profile: StateFlow<UserEntity?> = sessionManager.sessionFlow
         .flatMapLatest { session ->
@@ -268,7 +249,7 @@ class UserViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     fun loadProfile() {
-        // Reactive stream automatically handles loading and updates
+        /** Reactive stream automatically handles loading and updates  */
     }
 
     fun updateProfile(
@@ -305,13 +286,13 @@ class UserViewModel @Inject constructor(
                 lastName = lastName.trim(),
                 address = address.trim(),
                 contactNo = contactNo.trim(),
-                // Only re-hash if user entered a new password
+                /** Only re-hash if user entered a new password */
                 passwordHash = if (newPassword.isNotBlank()) PasswordHasher.hash(newPassword)
                 else current.passwordHash
             )
             try {
                 userRepo.updateUser(updated)
-                // Refresh session name
+                /** Refresh session name */
                 sessionManager.saveSession(
                     userId = updated.id,
                     role = updated.role,
@@ -325,7 +306,7 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    // ── Logout ────────────────────────────────────────────────
+    /** Logout */
     fun logout(onLogout: () -> Unit) {
         viewModelScope.launch { sessionManager.clearSession(); onLogout() }
     }

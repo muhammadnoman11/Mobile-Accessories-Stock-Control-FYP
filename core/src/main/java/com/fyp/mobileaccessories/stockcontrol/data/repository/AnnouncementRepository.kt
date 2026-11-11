@@ -4,6 +4,7 @@ import android.content.Context
 import com.fyp.mobileaccessories.stockcontrol.data.local.dao.AnnouncementDao
 import com.fyp.mobileaccessories.stockcontrol.data.local.entity.AnnouncementEntity
 import com.fyp.mobileaccessories.stockcontrol.util.ConnectionDetector
+import com.fyp.mobileaccessories.stockcontrol.util.NotificationHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -35,7 +36,7 @@ class AnnouncementRepository @Inject constructor(
         val id = announcementDao.insertAnnouncement(announcement)
         val annWithId = announcement.copy(id = id.toInt())
         remoteSyncManager.uploadAnnouncement(annWithId)
-        com.fyp.mobileaccessories.stockcontrol.util.NotificationHelper.sendAnnouncementNotification(
+        NotificationHelper.sendAnnouncementNotification(
             title = announcement.title,
             body = announcement.content
         )

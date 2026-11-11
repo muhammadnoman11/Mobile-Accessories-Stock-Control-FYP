@@ -54,22 +54,19 @@ import com.fyp.mobileaccessories.stockcontrol.ui.component.PrimaryButton
 import com.fyp.mobileaccessories.stockcontrol.ui.component.ProductImage
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
 
-// ============================================================
-// AddEditProductScreen
-// ============================================================
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditProductScreen(
     navController: NavController,
-    productId: Int,                         // -1 = new product
+    productId: Int,
+    /** -1 = new product */
     viewModel: AdminViewModel = hiltViewModel()
 ) {
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     val session by viewModel.session.collectAsStateWithLifecycle()
     val isOnline by viewModel.isOnline.collectAsStateWithLifecycle()
 
-    // State for each field
+    /** State for each field */
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var imageUrl by remember { mutableStateOf("") }
@@ -84,7 +81,7 @@ fun AddEditProductScreen(
 
     val snackState = remember { SnackbarHostState() }
 
-    // Load existing product data when editing
+    /** Load existing product data when editing */
     LaunchedEffect(productId) {
         if (productId > 0) {
             val product = viewModel.getProductById(productId)
@@ -103,7 +100,7 @@ fun AddEditProductScreen(
         }
     }
 
-    // Re-match category after categories load
+    /** Re-match category after categories load */
     LaunchedEffect(categories) {
         if (productId > 0 && selectedCat == null) {
             val product = viewModel.getProductById(productId)
@@ -139,7 +136,7 @@ fun AddEditProductScreen(
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 com.fyp.mobileaccessories.stockcontrol.ui.component.OfflineBanner(isOffline = !isOnline)
-                // Error
+                /** Error */
                 if (error.isNotBlank()) {
                     Surface(color = AppColors.ErrorContainer, shape = MaterialTheme.shapes.small) {
                         Text(
@@ -196,7 +193,7 @@ fun AddEditProductScreen(
                 }
 
                 SectionLabelProd("Category & Pricing")
-                // Category picker
+                /** Category picker */
                 DropdownField(
                     label = "Category",
                     selectedValue = selectedCat?.name ?: "Select Category",
@@ -221,7 +218,7 @@ fun AddEditProductScreen(
                     )
                 }
 
-                // Approved toggle (only admin can directly approve)
+                /** Approved toggle (only admin can directly approve) */
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -252,7 +249,7 @@ fun AddEditProductScreen(
                 PrimaryButton(
                     text = if (productId <= 0) "Add Product" else "Save Changes",
                     onClick = {
-                        // Validate
+                        /** Validate */
                         error = when {
                             name.isBlank() -> "Product name is required"
                             price.toDoubleOrNull() == null || price.toDouble() <= 0

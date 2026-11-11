@@ -110,7 +110,7 @@ fun RegisterScreen(
                 }
             }
 
-            // ── Section: Personal Info ────────────────────────
+            /** Personal Information Section */
             SectionLabel("Personal Information")
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -145,7 +145,7 @@ fun RegisterScreen(
                 onSelect = viewModel::onRegGender
             )
 
-            // Product Domain input field (like in Admin module)
+            /** Product Domain input field (like in Admin module) */
             AppTextField(
                 value = state.domain,
                 onValueChange = viewModel::onRegDomain,
@@ -154,7 +154,7 @@ fun RegisterScreen(
                 leadingIcon = Icons.Default.Category
             )
 
-            // ── Section: Contact Info ─────────────────────────
+            /** Contact Information Section */
             SectionLabel("Contact Information")
             AppTextField(
                 value = state.address,
@@ -172,7 +172,7 @@ fun RegisterScreen(
                 keyboardType = KeyboardType.Phone
             )
 
-            // ── Section: Account Credentials ─────────────────
+            /** Account Credentials Section */
             SectionLabel("Account Credentials")
             AppTextField(
                 value = state.email,

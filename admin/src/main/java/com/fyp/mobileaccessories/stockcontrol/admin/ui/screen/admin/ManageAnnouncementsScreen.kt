@@ -53,13 +53,7 @@ import com.fyp.mobileaccessories.stockcontrol.ui.component.DropdownField
 import com.fyp.mobileaccessories.stockcontrol.ui.component.EmptyState
 import com.fyp.mobileaccessories.stockcontrol.ui.component.PrimaryButton
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-import com.fyp.mobileaccessories.stockcontrol.util.DateUtils
 
-// ============================================================
-// ManageAnnouncementsScreen
-// ============================================================
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageAnnouncementsScreen(
     navController: NavController,

@@ -30,11 +30,6 @@ import com.fyp.mobileaccessories.stockcontrol.ui.component.RequestNotificationPe
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
 import com.fyp.mobileaccessories.stockcontrol.util.UserRole
 
-// ============================================================
-// FILE: presentation/auth/LoginScreen.kt
-// Login screen — email + password, role-based navigation on success
-// ============================================================
-
 @Composable
 fun LoginScreen(
     navController: NavController,
@@ -44,13 +39,13 @@ fun LoginScreen(
 
     RequestNotificationPermissionEffect()
 
-    // After successful login, navigate to the correct role dashboard
+    /** After successful login, navigate to the correct role dashboard */
     fun onLoginSuccess(role: String) {
         navController.navigateAndClear(Screen.AdminDashboard.route)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Top gradient header
+        /** Top gradient header */
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -97,7 +92,7 @@ fun LoginScreen(
 
             Spacer(Modifier.height(40.dp))
 
-            // Login Card
+            /** Login Card */
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -122,7 +117,7 @@ fun LoginScreen(
                         color = AppColors.TextSecondary
                     )
 
-                    // Error message
+                    /** Error message */
                     if (state.error != null) {
                         Surface(
                             color = AppColors.ErrorContainer,
@@ -147,7 +142,7 @@ fun LoginScreen(
                         }
                     }
 
-                    // Email field
+                    /** Email field */
                     AppTextField(
                         value = state.email,
                         onValueChange = viewModel::onEmailChange,
@@ -157,7 +152,7 @@ fun LoginScreen(
                         isError = state.error != null
                     )
 
-                    // Password field
+                    /** Password field */
                     AppTextField(
                         value = state.password,
                         onValueChange = viewModel::onPasswordChange,
@@ -167,7 +162,7 @@ fun LoginScreen(
                         isError = state.error != null
                     )
 
-                    // Login button
+                    /** Login button */
                     PrimaryButton(
                         text = "Sign In",
                         onClick = { viewModel.login(::onLoginSuccess) },

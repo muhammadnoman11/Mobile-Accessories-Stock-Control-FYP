@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,15 +13,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
@@ -35,8 +31,6 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -67,17 +61,8 @@ import androidx.navigation.NavController
 import com.fyp.mobileaccessories.stockcontrol.navigation.Screen
 import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTextField
 import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTopBar
-import com.fyp.mobileaccessories.stockcontrol.ui.component.EmptyState
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-import com.fyp.mobileaccessories.stockcontrol.util.DateUtils
 
-// ============================================================
-// FILE: presentation/user/UserProfileScreen.kt
-// Customer profile — view and edit name, address, contact,
-// change password. All saved to Room DB via UserRepository.
-// ============================================================
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen(
     navController: NavController,
@@ -96,7 +81,7 @@ fun UserProfileScreen(
         }
     }
 
-    // Editable fields
+    /** Editable fields */
     var firstName by remember(profile) { mutableStateOf(profile?.firstName ?: "") }
     var lastName by remember(profile) { mutableStateOf(profile?.lastName ?: "") }
     var address by remember(profile) { mutableStateOf(profile?.address ?: "") }
@@ -121,7 +106,7 @@ fun UserProfileScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ── Avatar + name header ──────────────────────────
+            /** Avatar and name header */
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -158,7 +143,7 @@ fun UserProfileScreen(
 
             HorizontalDivider(color = AppColors.Divider)
 
-            // ── Edit toggle ───────────────────────────────────
+            /** Edit toggle */
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -179,7 +164,7 @@ fun UserProfileScreen(
             }
 
             if (isEditing) {
-                // ── Edit mode ─────────────────────────────────
+                /** Edit mode */
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     AppTextField(
                         value = firstName,
@@ -240,7 +225,7 @@ fun UserProfileScreen(
                     Text("Save Changes", fontWeight = FontWeight.Bold)
                 }
             } else {
-                // ── View mode ─────────────────────────────────
+                /** View mode */
                 profile?.let { u ->
                     ProfileInfoRow(
                         Icons.Default.Person,
@@ -260,7 +245,7 @@ fun UserProfileScreen(
 
             HorizontalDivider(color = AppColors.Divider)
 
-            // ── Sign out button ───────────────────────────────
+            /** Sign out button */
             OutlinedButton(
                 onClick = {
                     viewModel.logout {

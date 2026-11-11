@@ -12,12 +12,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 
-// ─────────────────────────────────────────────
 // COLOR PALETTE — Dynamic per module
-// ─────────────────────────────────────────────
 object AppColors {
     // Primary palette
-    var Primary: Color = Color(0xFF7C3AED)          // Default Royal Purple
+    var Primary: Color = Color(0xFF7C3AED)
     var PrimaryVariant: Color = Color(0xFF6D28D9)
     var PrimaryContainer: Color = Color(0xFFEDE9FE)
 
@@ -161,7 +159,7 @@ fun AdminTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = adminColorScheme.primary.toArgb()
+            window.statusBarColor = adminColorScheme.primaryContainer.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
         }
     }
@@ -198,7 +196,7 @@ fun ModeratorTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = modColorScheme.primary.toArgb()
+            window.statusBarColor = modColorScheme.primaryContainer.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
         }
     }
@@ -235,7 +233,7 @@ fun UserTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = userColorScheme.primary.toArgb()
+            window.statusBarColor = userColorScheme.primaryContainer.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
         }
     }

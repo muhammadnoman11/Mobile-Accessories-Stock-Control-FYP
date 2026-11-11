@@ -19,11 +19,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// ============================================================
-// FILE: presentation/auth/AuthViewModel.kt
-// Handles login, registration (Moderator), and session management with FCM tokens.
-// ============================================================
-
 data class LoginUiState(
     val email: String = "",
     val password: String = "",

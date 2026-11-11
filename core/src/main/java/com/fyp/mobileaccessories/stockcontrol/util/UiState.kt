@@ -1,13 +1,6 @@
 package com.fyp.mobileaccessories.stockcontrol.util
 
-
-// ============================================================
-// FILE: util/UiState.kt
-// Generic UI state wrapper for all screens
-// ============================================================
-
-
-// Sealed class to represent all possible UI states
+/** Sealed class to represent all possible UI states */
 sealed class UiState<out T> {
     object Idle : UiState<Nothing>()
     object Loading : UiState<Nothing>()
@@ -15,7 +8,7 @@ sealed class UiState<out T> {
     data class Error(val message: String) : UiState<Nothing>()
 }
 
-// Constants for roles
+/** Constants for roles */
 object UserRole {
     const val ADMIN = "ADMIN"
     const val MODERATOR = "MODERATOR"
@@ -23,7 +16,7 @@ object UserRole {
     const val EMPLOYEE = "EMPLOYEE"
 }
 
-// Constants for order status
+/** Constants for order status */
 object OrderStatus {
     const val PENDING = "PENDING"
     const val CONFIRMED = "CONFIRMED"
@@ -32,7 +25,7 @@ object OrderStatus {
     const val CANCELLED = "CANCELLED"
 }
 
-// Constants for payment modes
+/** Constants for payment modes */
 object PaymentMode {
     const val CASH_ON_DELIVERY = "CASH_ON_DELIVERY"
     const val BANK_TRANSFER = "BANK_TRANSFER"
@@ -46,14 +39,14 @@ object PaymentMode {
     }
 }
 
-// Constants for transaction status
+/** Constants for transaction status */
 object TransactionStatus {
     const val PENDING = "PENDING"
     const val APPROVED = "APPROVED"
     const val REJECTED = "REJECTED"
 }
 
-// Constants for announcement types
+/** Constants for announcement types */
 object AnnouncementType {
     const val GENERAL = "GENERAL"
     const val SALE = "SALE"

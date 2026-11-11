@@ -21,23 +21,30 @@ class PaymentCompanyRepository @Inject constructor(
         }
     }
 
-    fun getAllPaymentCompanies(): Flow<List<PaymentCompanyEntity>> = paymentCompanyDao.getAllPaymentCompanies()
-    fun getActivePaymentCompanies(): Flow<List<PaymentCompanyEntity>> = paymentCompanyDao.getActivePaymentCompanies()
+    fun getAllPaymentCompanies(): Flow<List<PaymentCompanyEntity>> =
+        paymentCompanyDao.getAllPaymentCompanies()
+
+    fun getActivePaymentCompanies(): Flow<List<PaymentCompanyEntity>> =
+        paymentCompanyDao.getActivePaymentCompanies()
+
     suspend fun getPaymentCompanyById(id: Int) = paymentCompanyDao.getPaymentCompanyById(id)
     suspend fun insertPaymentCompany(company: PaymentCompanyEntity) {
         ensureOnline("add payment company")
         val id = paymentCompanyDao.insertPaymentCompany(company)
         remoteSyncManager.uploadPaymentCompany(company.copy(id = id.toInt()))
     }
+
     suspend fun updatePaymentCompany(company: PaymentCompanyEntity) {
         ensureOnline("update payment company")
         paymentCompanyDao.updatePaymentCompany(company)
         remoteSyncManager.uploadPaymentCompany(company)
     }
+
     suspend fun deletePaymentCompany(company: PaymentCompanyEntity) {
         ensureOnline("delete payment company")
         paymentCompanyDao.deletePaymentCompany(company)
         remoteSyncManager.deletePaymentCompany(company.id)
     }
+
     fun searchPaymentCompanies(query: String) = paymentCompanyDao.searchPaymentCompanies(query)
 }

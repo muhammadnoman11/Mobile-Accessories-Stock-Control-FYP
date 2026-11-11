@@ -25,7 +25,6 @@ import com.fyp.mobileaccessories.stockcontrol.ui.component.UserCard
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
 import com.fyp.mobileaccessories.stockcontrol.util.UserRole
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageUsersScreen(
     navController: NavController,

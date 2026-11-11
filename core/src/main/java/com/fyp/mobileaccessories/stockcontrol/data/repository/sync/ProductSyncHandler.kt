@@ -30,15 +30,19 @@ class ProductSyncHandler(
                     val subCategory = child.child("subCategory").getValue(String::class.java) ?: ""
                     val price = child.child("price").getValue(Double::class.java) ?: 0.0
                     val stockQuantity = child.child("stockQuantity").getValue(Int::class.java) ?: 0
-                    val lowStockThreshold = child.child("lowStockThreshold").getValue(Int::class.java) ?: 5
+                    val lowStockThreshold =
+                        child.child("lowStockThreshold").getValue(Int::class.java) ?: 5
                     val addedByUserId = child.child("addedByUserId").getValue(Int::class.java)
                     val isApproved = child.child("isApproved").getValue(Boolean::class.java)
                         ?: child.child("approved").getValue(Boolean::class.java) ?: false
                     val status = child.child("status").getValue(String::class.java)
                         ?: if (isApproved) "APPROVED" else "PENDING"
-                    val rejectionReason = child.child("rejectionReason").getValue(String::class.java) ?: ""
-                    val dateAdded = child.child("dateAdded").getValue(Long::class.java) ?: System.currentTimeMillis()
-                    val imageUrl = child.child("imageUrl").getValue(String::class.java)?.trim() ?: ""
+                    val rejectionReason =
+                        child.child("rejectionReason").getValue(String::class.java) ?: ""
+                    val dateAdded = child.child("dateAdded").getValue(Long::class.java)
+                        ?: System.currentTimeMillis()
+                    val imageUrl =
+                        child.child("imageUrl").getValue(String::class.java)?.trim() ?: ""
 
                     val product = ProductEntity(
                         id = id, name = name, description = description, categoryId = categoryId,

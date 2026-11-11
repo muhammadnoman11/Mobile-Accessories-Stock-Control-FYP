@@ -36,11 +36,6 @@ import androidx.navigation.NavController
 import com.fyp.mobileaccessories.stockcontrol.data.local.entity.ProductEntity
 import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTopBar
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-import com.fyp.mobileaccessories.stockcontrol.util.DateUtils
-
-// ============================================================
-// StockReportScreen — Shows all products with stock levels
-// ============================================================
 
 @Composable
 fun StockReportScreen(
@@ -79,7 +74,7 @@ fun StockReportScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.padding(padding)
         ) {
-            // ── Low Stock Alerts ───────────────────────────
+            /** Low Stock Alerts */
             if (lowStock.isNotEmpty()) {
                 item {
                     Text(
@@ -95,7 +90,7 @@ fun StockReportScreen(
                 }
             }
 
-            // ── All Products stock overview ─────────────────
+            /** All Products stock overview */
             item {
                 Text(
                     "All Products Stock",
@@ -106,7 +101,7 @@ fun StockReportScreen(
                 StockProductRow(product = p, onAdjust = { adjustTarget = p })
             }
 
-            // ── Recent Stock Movements ──────────────────────
+            /** Recent Stock Movements */
             if (movements.isNotEmpty()) {
                 item {
                     Text(
@@ -135,7 +130,7 @@ fun StockReportScreen(
         }
     }
 
-    // Stock adjustment dialog
+    /** Stock adjustment dialog */
     adjustTarget?.let { product ->
         StockAdjustDialog(
             product = product,

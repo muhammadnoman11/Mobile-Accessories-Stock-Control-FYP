@@ -1,11 +1,3 @@
-package com.fyp.mobileaccessories.stockcontrol.util
-
-
-// ============================================================
-// FILE: util/DateUtils.kt
-// Date formatting helpers
-// ============================================================
-
 import java.text.SimpleDateFormat
 import java.util.*
 

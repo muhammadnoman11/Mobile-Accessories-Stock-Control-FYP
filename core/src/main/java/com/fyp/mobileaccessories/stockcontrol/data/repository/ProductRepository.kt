@@ -71,7 +71,11 @@ class ProductRepository @Inject constructor(
 
         val product = productDao.getProductById(productId)
         if (product != null) {
-            val updated = product.copy(isApproved = approved, status = status, rejectionReason = rejectionReason)
+            val updated = product.copy(
+                isApproved = approved,
+                status = status,
+                rejectionReason = rejectionReason
+            )
             productDao.insertProduct(updated)
             remoteSyncManager.uploadProduct(updated)
             NotificationHelper.sendProductApprovalNotification(

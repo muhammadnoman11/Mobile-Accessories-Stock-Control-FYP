@@ -40,7 +40,7 @@ import com.fyp.mobileaccessories.stockcontrol.data.local.entity.UserEntity
 )
 abstract class AppDatabase : RoomDatabase() {
 
-    // All DAOs exposed as abstract functions
+    /** All DAOs exposed as abstract functions */
     abstract fun userDao(): UserDao
     abstract fun categoryDao(): CategoryDao
     abstract fun productDao(): ProductDao

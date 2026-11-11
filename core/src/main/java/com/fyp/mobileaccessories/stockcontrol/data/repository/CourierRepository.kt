@@ -29,11 +29,13 @@ class CourierRepository @Inject constructor(
         val id = courierDao.insertCourier(courier)
         remoteSyncManager.uploadCourier(courier.copy(id = id.toInt()))
     }
+
     suspend fun updateCourier(courier: CourierEntity) {
         ensureOnline("update courier")
         courierDao.updateCourier(courier)
         remoteSyncManager.uploadCourier(courier)
     }
+
     suspend fun deleteCourier(courier: CourierEntity) {
         ensureOnline("delete courier")
         courierDao.deleteCourier(courier)

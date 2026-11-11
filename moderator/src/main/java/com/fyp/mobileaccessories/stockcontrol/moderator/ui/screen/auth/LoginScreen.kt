@@ -127,7 +127,7 @@ fun LoginScreen(
                         color = AppColors.TextSecondary
                     )
 
-                    // Registration Success Message Banner
+                    /** Registration Success Message Banner */
                     if (registeredMsg != null) {
                         Surface(
                             color = AppColors.SuccessContainer,
@@ -205,7 +205,7 @@ fun LoginScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Register Moderator Link
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,

@@ -34,12 +34,6 @@ import androidx.navigation.NavController
 import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTopBar
 import com.fyp.mobileaccessories.stockcontrol.ui.component.EmptyState
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-import com.fyp.mobileaccessories.stockcontrol.util.DateUtils
-
-// ============================================================
-// FILE: presentation/user/AnnouncementsScreen.kt
-// Displays all active announcements to customers.
-// ============================================================
 
 @Composable
 fun AnnouncementsScreen(

@@ -34,7 +34,6 @@ import com.fyp.mobileaccessories.stockcontrol.ui.screen.user.component.PriceBrea
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
 import com.fyp.mobileaccessories.stockcontrol.util.PaymentMode
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceOrderScreen(
     navController: NavController,

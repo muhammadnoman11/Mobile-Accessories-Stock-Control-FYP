@@ -17,13 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// ============================================================
-// FILE: presentation/auth/AuthViewModel.kt
-// Handles login, registration, and session management.
-// Used by SplashScreen, LoginScreen, and RegisterScreen.
-// ============================================================
-
-// ── UI State: Login Screen ────────────────────────────────────
+/** Login Screen UI State */
 data class LoginUiState(
     val email: String = "",
     val password: String = "",
@@ -31,7 +25,7 @@ data class LoginUiState(
     val error: String? = null
 )
 
-// ── UI State: Register Screen ─────────────────────────────────
+/** Register Screen UI State */
 data class RegisterUiState(
     val firstName: String = "",
     val lastName: String = "",
@@ -52,7 +46,7 @@ class AuthViewModel @Inject constructor(
     private val sessionManager: SessionManager
 ) : ViewModel() {
 
-    // ── Session flow — null means not logged in ───────────────
+    /** Session Flow */
     val session: StateFlow<SessionData?> = sessionManager.sessionFlow
         .stateIn(
             scope = viewModelScope,
@@ -60,19 +54,19 @@ class AuthViewModel @Inject constructor(
             initialValue = null
         )
 
-    // ── Login State ───────────────────────────────────────────
+    /** Login State */
     private val _loginState = MutableStateFlow(LoginUiState())
     val loginState: StateFlow<LoginUiState> = _loginState.asStateFlow()
 
-    // ── Register State ────────────────────────────────────────
+    /** Register State */
     private val _registerState = MutableStateFlow(RegisterUiState())
     val registerState: StateFlow<RegisterUiState> = _registerState.asStateFlow()
 
-    // ── Login field handlers ──────────────────────────────────
+    /** Login Field Handlers */
     fun onEmailChange(v: String) = _loginState.update { it.copy(email = v.trim(), error = null) }
     fun onPasswordChange(v: String) = _loginState.update { it.copy(password = v, error = null) }
 
-    // ── Register field handlers ───────────────────────────────
+    /** Register Field Handlers */
     fun onRegFirstName(v: String) = _registerState.update { it.copy(firstName = v.take(15), error = null) }
     fun onRegLastName(v: String) = _registerState.update { it.copy(lastName = v.take(15), error = null) }
     fun onRegGender(v: String) = _registerState.update { it.copy(gender = v, error = null) }
@@ -83,9 +77,7 @@ class AuthViewModel @Inject constructor(
     fun onRegConfirmPassword(v: String) =
         _registerState.update { it.copy(confirmPassword = v, error = null) }
 
-    // ── LOGIN ─────────────────────────────────────────────────
-    // Validates fields, calls repository login (password hashed),
-    // saves session to DataStore, then fires onSuccess(role)
+    /** Login */
     fun login(onSuccess: (role: String) -> Unit) {
         val s = _loginState.value
         if (s.email.isBlank() || s.password.isBlank()) {
@@ -98,7 +90,7 @@ class AuthViewModel @Inject constructor(
                 val user = userRepository.login(s.email, s.password)
                 if (user != null) {
                     if (user.role == "ADMIN" || user.role == "EMPLOYEE") {
-                        // Persist login session in DataStore (survives app restart)
+                        /** Persist login session in DataStore */
                         sessionManager.saveSession(
                             userId = user.id,
                             role = user.role,
@@ -124,7 +116,7 @@ class AuthViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                // Offline fallback using local Room DB
+                /** Offline fallback using local Room DB */
                 val localUser = userRepository.loginLocally(s.email, PasswordHasher.hash(s.password))
                 if (localUser != null && (localUser.role == "ADMIN" || localUser.role == "EMPLOYEE")) {
                     sessionManager.saveSession(
@@ -147,12 +139,10 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    // ── REGISTER ──────────────────────────────────────────────
-    // Self-registration always creates a USER role account.
-    // Admin creates MODERATOR accounts from the admin panel.
+    /** Register */
     fun register(onSuccess: () -> Unit) {
         val s = _registerState.value
-        // Client-side validation before hitting the DB
+        /** Client-side validation before hitting the DB */
         val error = when {
             s.firstName.isBlank() -> "First name is required"
             s.firstName.length > 15 -> "First name cannot exceed 15 characters"
@@ -183,7 +173,7 @@ class AuthViewModel @Inject constructor(
                     contactNo = s.contactNo.trim(),
                     email = s.email,
                     passwordHash = PasswordHasher.hash(s.password),
-                    role = "USER"  // Always USER from self-registration
+                    role = "USER"
                 ),
                 plainPassword = s.password
             )
@@ -201,7 +191,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    // ── LOGOUT ────────────────────────────────────────────────
+    /** Logout */
     fun logout(onLogout: () -> Unit) {
         viewModelScope.launch {
             sessionManager.clearSession()

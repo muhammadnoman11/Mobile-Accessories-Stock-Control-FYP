@@ -42,7 +42,7 @@ fun AppNavigation(
         navController = navController,
         startDestination = startDestination
     ) {
-        // ── AUTH ──────────────────────────────────
+        /** Authentication */
         composable(Screen.Splash.route) {
             SplashScreen(navController = navController)
         }
@@ -53,7 +53,7 @@ fun AppNavigation(
             RegisterScreen(navController = navController)
         }
 
-        // ── USER (CUSTOMER) ───────────────────────
+        /** User Customer */
         composable(Screen.UserHome.route) {
             UserHomeScreen(navController = navController)
         }

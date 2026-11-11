@@ -18,7 +18,6 @@ import com.fyp.mobileaccessories.stockcontrol.moderator.ui.screen.moderator.ModV
 import com.fyp.mobileaccessories.stockcontrol.ui.component.ProductImage
 import com.fyp.mobileaccessories.stockcontrol.ui.component.StatusBadge
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-import com.fyp.mobileaccessories.stockcontrol.util.DateUtils
 
 @Composable
 fun ModOrderCard(

@@ -1,13 +1,12 @@
 package com.fyp.mobileaccessories.stockcontrol.navigation
 
-
 sealed class Screen(val route: String) {
-    // Auth
+    /** Auth */
     object Splash : Screen("splash")
     object Login : Screen("login")
     object Register : Screen("register")
 
-    // Admin
+    /** Admin */
     object AdminDashboard : Screen("admin_dashboard")
     object ManageUsers : Screen("admin_manage_users")
     object ManageModerators : Screen("admin_manage_moderators")
@@ -24,13 +23,13 @@ sealed class Screen(val route: String) {
     object StockReport : Screen("admin_stock_report")
     object AdminProfile : Screen("admin_profile")
 
-    // Moderator
+    /** Moderator */
     object ModDashboard : Screen("mod_dashboard")
     object ApproveProducts : Screen("mod_approve_products")
     object TrackOrders : Screen("mod_track_orders")
     object ModProfile : Screen("mod_profile")
 
-    // User
+    /** User */
     object UserHome : Screen("user_home")
     object ProductList : Screen("user_products")
     object ProductDetail : Screen("user_product_detail/{productId}") {

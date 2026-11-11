@@ -35,12 +35,20 @@ class SupportSyncHandler(
                     val status = child.child("status").getValue(String::class.java) ?: "PENDING"
                     val referenceNo = child.child("referenceNo").getValue(String::class.java) ?: ""
                     val remarks = child.child("remarks").getValue(String::class.java) ?: ""
-                    val transactionDate = child.child("transactionDate").getValue(Long::class.java) ?: System.currentTimeMillis()
+                    val transactionDate = child.child("transactionDate").getValue(Long::class.java)
+                        ?: System.currentTimeMillis()
 
                     val transaction = TransactionEntity(
-                        id = id, orderId = orderId, userId = userId, paymentCompanyId = paymentCompanyId,
-                        amount = amount, paymentMode = paymentMode, status = status,
-                        referenceNo = referenceNo, remarks = remarks, transactionDate = transactionDate
+                        id = id,
+                        orderId = orderId,
+                        userId = userId,
+                        paymentCompanyId = paymentCompanyId,
+                        amount = amount,
+                        paymentMode = paymentMode,
+                        status = status,
+                        referenceNo = referenceNo,
+                        remarks = remarks,
+                        transactionDate = transactionDate
                     )
                     transactionDao.insertTransaction(transaction)
                 } catch (e: Exception) {
@@ -52,7 +60,10 @@ class SupportSyncHandler(
                 for (local in localTransactions) {
                     if (local.id !in cloudIds) {
                         transactionDao.deleteTransaction(local)
-                        Log.d(TAG, "Deleted local transaction TXN #${local.id} as it was removed from Realtime Database.")
+                        Log.d(
+                            TAG,
+                            "Deleted local transaction TXN #${local.id} as it was removed from Realtime Database."
+                        )
                     }
                 }
             } catch (e: Exception) {
@@ -71,14 +82,20 @@ class SupportSyncHandler(
                     val name = child.child("name").getValue(String::class.java) ?: ""
                     val contactNo = child.child("contactNo").getValue(String::class.java) ?: ""
                     val email = child.child("email").getValue(String::class.java) ?: ""
-                    val deliveryCharges = child.child("deliveryCharges").getValue(Double::class.java) ?: 0.0
+                    val deliveryCharges =
+                        child.child("deliveryCharges").getValue(Double::class.java) ?: 0.0
                     val estimatedDays = child.child("estimatedDays").getValue(Int::class.java) ?: 3
                     val isActive = child.child("active").getValue(Boolean::class.java)
                         ?: child.child("isActive").getValue(Boolean::class.java) ?: true
 
                     val courier = CourierEntity(
-                        id = id, name = name, contactNo = contactNo, email = email,
-                        deliveryCharges = deliveryCharges, estimatedDays = estimatedDays, isActive = isActive
+                        id = id,
+                        name = name,
+                        contactNo = contactNo,
+                        email = email,
+                        deliveryCharges = deliveryCharges,
+                        estimatedDays = estimatedDays,
+                        isActive = isActive
                     )
                     courierDao.insertCourier(courier)
                 } catch (e: Exception) {
@@ -90,7 +107,10 @@ class SupportSyncHandler(
                 for (local in localCouriers) {
                     if (local.id !in cloudIds) {
                         courierDao.deleteCourier(local)
-                        Log.d(TAG, "Deleted local courier ${local.name} as it was removed from Realtime Database.")
+                        Log.d(
+                            TAG,
+                            "Deleted local courier ${local.name} as it was removed from Realtime Database."
+                        )
                     }
                 }
             } catch (e: Exception) {
@@ -107,13 +127,18 @@ class SupportSyncHandler(
                     val id = child.child("id").getValue(Int::class.java) ?: continue
                     cloudIds.add(id)
                     val name = child.child("name").getValue(String::class.java) ?: ""
-                    val type = child.child("type").getValue(String::class.java) ?: "PAYMENT_RECEIVER"
+                    val type =
+                        child.child("type").getValue(String::class.java) ?: "PAYMENT_RECEIVER"
                     val accountNo = child.child("accountNo").getValue(String::class.java) ?: ""
                     val isActive = child.child("active").getValue(Boolean::class.java)
                         ?: child.child("isActive").getValue(Boolean::class.java) ?: true
 
                     val company = PaymentCompanyEntity(
-                        id = id, name = name, type = type, accountNo = accountNo, isActive = isActive
+                        id = id,
+                        name = name,
+                        type = type,
+                        accountNo = accountNo,
+                        isActive = isActive
                     )
                     paymentCompanyDao.insertPaymentCompany(company)
                 } catch (e: Exception) {
@@ -125,7 +150,10 @@ class SupportSyncHandler(
                 for (local in localCompanies) {
                     if (local.id !in cloudIds) {
                         paymentCompanyDao.deletePaymentCompany(local)
-                        Log.d(TAG, "Deleted local payment company ${local.name} as it was removed from Realtime Database.")
+                        Log.d(
+                            TAG,
+                            "Deleted local payment company ${local.name} as it was removed from Realtime Database."
+                        )
                     }
                 }
             } catch (e: Exception) {

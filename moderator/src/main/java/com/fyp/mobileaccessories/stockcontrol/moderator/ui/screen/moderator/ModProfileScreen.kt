@@ -23,7 +23,6 @@ import com.fyp.mobileaccessories.stockcontrol.navigation.Screen
 import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTopBar
 import com.fyp.mobileaccessories.stockcontrol.ui.component.ProfileInfoRow
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-import com.fyp.mobileaccessories.stockcontrol.util.DateUtils
 
 @Composable
 fun ModProfileScreen(
@@ -94,13 +93,35 @@ fun ModProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                ProfileInfoRow(Icons.Default.Phone, "Contact No", modProfile?.contactNo ?: "—", iconTint = Color(0xFFD97706))
-                ProfileInfoRow(Icons.Default.LocationOn, "Address", modProfile?.address ?: "—", iconTint = Color(0xFFD97706))
-                ProfileInfoRow(Icons.Default.Category, "Product Domain", modProfile?.domain ?: "—", iconTint = Color(0xFFD97706))
-                ProfileInfoRow(Icons.Default.Male, "Gender", modProfile?.gender ?: "—", iconTint = Color(0xFFD97706))
+                ProfileInfoRow(
+                    Icons.Default.Phone,
+                    "Contact No",
+                    modProfile?.contactNo ?: "—",
+                    iconTint = Color(0xFFD97706)
+                )
+                ProfileInfoRow(
+                    Icons.Default.LocationOn,
+                    "Address",
+                    modProfile?.address ?: "—",
+                    iconTint = Color(0xFFD97706)
+                )
+                ProfileInfoRow(
+                    Icons.Default.Category,
+                    "Product Domain",
+                    modProfile?.domain ?: "—",
+                    iconTint = Color(0xFFD97706)
+                )
+                ProfileInfoRow(
+                    Icons.Default.Male,
+                    "Gender",
+                    modProfile?.gender ?: "—",
+                    iconTint = Color(0xFFD97706)
+                )
                 ProfileInfoRow(
                     Icons.Default.CalendarToday, "Member Since",
-                    DateUtils.formatDate(modProfile?.dateOfRegistration ?: System.currentTimeMillis()),
+                    DateUtils.formatDate(
+                        modProfile?.dateOfRegistration ?: System.currentTimeMillis()
+                    ),
                     iconTint = Color(0xFFD97706)
                 )
             }

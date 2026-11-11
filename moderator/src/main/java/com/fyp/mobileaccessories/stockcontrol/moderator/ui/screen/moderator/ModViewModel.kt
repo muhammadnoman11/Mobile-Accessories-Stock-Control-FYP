@@ -18,12 +18,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// ============================================================
-// FILE: presentation/moderator/ModViewModel.kt
-// ViewModel for all Moderator screens.
-// Handles: product approval, order tracking, profile.
-// ============================================================
-
 @HiltViewModel
 class ModViewModel @Inject constructor(
     private val productRepo: ProductRepository,
@@ -33,15 +27,15 @@ class ModViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    // ── Real-time Connectivity ──────────────────────────────
+    /** Real-time Connectivity */
     val isOnline: StateFlow<Boolean> = ConnectionDetector.observeConnectivity(context)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ConnectionDetector.isConnected(context))
 
-    // ── Session ───────────────────────────────────────────────
+    /** Session */
     val session = sessionManager.sessionFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    // ── Moderator Profile (Reactive) ──────────────────────────
+    /** Moderator Profile */
     @OptIn(ExperimentalCoroutinesApi::class)
     val moderatorProfile: StateFlow<UserEntity?> = sessionManager.sessionFlow
         .flatMapLatest { session ->
@@ -53,7 +47,7 @@ class ModViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    // ── Dashboard counts (Reactive) ───────────────────────────
+    /** Dashboard counts */
     val pendingProductCount: StateFlow<Int> = productRepo.getPendingProducts()
         .map { it.size }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
@@ -63,14 +57,14 @@ class ModViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
 
     fun loadDashboardStats() {
-        // Reactive stream automatically handles loading and updates
+        /** Reactive stream automatically handles loading and updates */
     }
 
-    // ── Products awaiting approval ────────────────────────────
+    /** Products awaiting approval */
     val pendingProducts: StateFlow<List<ProductEntity>> = productRepo.getPendingProducts()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    // Approve a product — requires internet
+    /** Approve a product — requires internet */
     fun approveProduct(productId: Int, onDone: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             if (!ConnectionDetector.isConnected(context)) {
@@ -86,7 +80,7 @@ class ModViewModel @Inject constructor(
         }
     }
 
-    // Reject product — requires internet
+    /** Reject product — requires internet */
     fun rejectProduct(productId: Int, reason: String, onDone: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             if (!ConnectionDetector.isConnected(context)) {
@@ -102,7 +96,7 @@ class ModViewModel @Inject constructor(
         }
     }
 
-    // ── Orders to track ───────────────────────────────────────
+    /** Orders to track */
     val orders: StateFlow<List<OrderEntity>> = orderRepo.getAllOrders()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
@@ -124,7 +118,7 @@ class ModViewModel @Inject constructor(
         }
     }
 
-    // ── Logout ────────────────────────────────────────────────
+    /** Logout */
     fun logout(onLogout: () -> Unit) {
         viewModelScope.launch { sessionManager.clearSession(); onLogout() }
     }

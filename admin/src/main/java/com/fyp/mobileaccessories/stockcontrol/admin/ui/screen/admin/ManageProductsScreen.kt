@@ -4,40 +4,24 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.fyp.mobileaccessories.stockcontrol.data.local.entity.CategoryEntity
 import com.fyp.mobileaccessories.stockcontrol.data.local.entity.ProductEntity
 import com.fyp.mobileaccessories.stockcontrol.navigation.Screen
-import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTextField
 import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTopBar
 import com.fyp.mobileaccessories.stockcontrol.ui.component.ConfirmDialog
-import com.fyp.mobileaccessories.stockcontrol.ui.component.DropdownField
 import com.fyp.mobileaccessories.stockcontrol.ui.component.EmptyState
-import com.fyp.mobileaccessories.stockcontrol.ui.component.LoadingScreen
-import com.fyp.mobileaccessories.stockcontrol.ui.component.PrimaryButton
 import com.fyp.mobileaccessories.stockcontrol.ui.component.ProductCard
 import com.fyp.mobileaccessories.stockcontrol.ui.component.SearchBar
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-
-// ============================================================
-// FILE: presentation/admin/ManageProductsScreen.kt
-// Full product management: search by name/description/subcategory,
-// filter by category, approve/reject, add/edit/delete.
-// ============================================================
 
 @Composable
 fun ManageProductsScreen(
@@ -91,7 +75,7 @@ fun ManageProductsScreen(
             com.fyp.mobileaccessories.stockcontrol.ui.component.OfflineBanner(isOffline = !isOnline)
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Spacer(Modifier.height(12.dp))
-                // Search
+                /** Search */
                 SearchBar(
                     query = query,
                     onQueryChange = viewModel::onProductQueryChange,
@@ -100,12 +84,12 @@ fun ManageProductsScreen(
                 Spacer(Modifier.height(8.dp))
             }
 
-            // Category filter chips
+            /** Category filter chips */
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // "All" chip
+                /** "All" chip */
                 item {
                     FilterChip(
                         selected = catFilter == -1,
@@ -145,7 +129,7 @@ fun ManageProductsScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(products, key = { it.id }) { product ->
-                        // Find category name
+                        /** Find category name */
                         val catName = categories.find { it.id == product.categoryId }?.name ?: "—"
                         ProductCard(
                             name = product.name,
@@ -166,7 +150,9 @@ fun ManageProductsScreen(
                                     )
                                 }
                             },
-                            onDelete = if (isEmployee) null else { { deleteTarget = product } }
+                            onDelete = if (isEmployee) null else {
+                                { deleteTarget = product }
+                            }
                         )
                     }
                     item { Spacer(Modifier.height(80.dp)) }
@@ -175,7 +161,7 @@ fun ManageProductsScreen(
         }
     }
 
-    // Delete confirmation
+    /** Delete confirmation */
     deleteTarget?.let { target ->
         ConfirmDialog(
             title = "Delete \"${target.name}\"?",

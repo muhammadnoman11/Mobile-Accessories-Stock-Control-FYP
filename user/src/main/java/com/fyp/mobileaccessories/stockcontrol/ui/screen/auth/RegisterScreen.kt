@@ -30,7 +30,7 @@ fun RegisterScreen(
 ) {
     val state by viewModel.registerState.collectAsStateWithLifecycle()
 
-    // After success, set login message and return to Login screen
+    /** After success, set login message and return to Login screen */
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
             navController.previousBackStackEntry?.savedStateHandle?.set(
@@ -74,7 +74,7 @@ fun RegisterScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Header text
+            /** Header text */
             Column {
                 Text("Join StockControl",
                     style = MaterialTheme.typography.titleLarge,
@@ -85,7 +85,7 @@ fun RegisterScreen(
                     color = AppColors.TextSecondary)
             }
 
-            // Error Banner
+            /** Error Banner */
             if (state.error != null) {
                 Surface(
                     color = AppColors.ErrorContainer,
@@ -104,7 +104,7 @@ fun RegisterScreen(
                 }
             }
 
-            // ── Section: Personal Info ────────────────────────
+            /** Personal Information Section */
             SectionLabel("Personal Information")
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -132,7 +132,7 @@ fun RegisterScreen(
                 )
             }
 
-            // Gender dropdown
+            /** Gender dropdown */
             DropdownField(
                 label = "Gender",
                 selectedValue = state.gender,
@@ -140,7 +140,7 @@ fun RegisterScreen(
                 onSelect = viewModel::onRegGender
             )
 
-            // ── Section: Contact Info ─────────────────────────
+            /** Contact Information Section */
             SectionLabel("Contact Information")
             AppTextField(
                 value = state.address,
@@ -158,7 +158,7 @@ fun RegisterScreen(
                 keyboardType = KeyboardType.Phone
             )
 
-            // ── Section: Account Credentials ─────────────────
+            /** Account Credentials Section */
             SectionLabel("Account Credentials")
             AppTextField(
                 value = state.email,
@@ -182,7 +182,7 @@ fun RegisterScreen(
                 isPassword = true
             )
 
-            // Role notice
+            /** Role notice */
             Surface(
                 color = AppColors.InfoContainer,
                 shape = RoundedCornerShape(8.dp)
@@ -208,7 +208,7 @@ fun RegisterScreen(
                 icon = Icons.Default.PersonAdd
             )
 
-            // Back to login link
+            /** Back to login link */
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -226,7 +226,7 @@ fun RegisterScreen(
     }
 }
 
-// Small helper composable for section labels in the form
+/** Small helper composable for section labels in the form */
 @Composable
 private fun SectionLabel(text: String) {
     Text(

@@ -2,12 +2,10 @@ package com.fyp.mobileaccessories.stockcontrol.admin.ui.screen.admin
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -24,7 +22,6 @@ import com.fyp.mobileaccessories.stockcontrol.navigation.Screen
 import com.fyp.mobileaccessories.stockcontrol.ui.component.OfflineBanner
 import com.fyp.mobileaccessories.stockcontrol.ui.component.StatCard
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
-import com.fyp.mobileaccessories.stockcontrol.util.DateUtils
 import com.fyp.mobileaccessories.stockcontrol.util.UserRole
 
 @Composable
@@ -58,7 +55,6 @@ fun AdminDashboardScreen(
                             listOf(AppColors.Primary, AppColors.CardGradientEnd)
                         )
                     )
-                    .statusBarsPadding()
                     .padding(24.dp)
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -100,7 +96,9 @@ fun AdminDashboardScreen(
                         icon = Icons.Default.People,
                         containerColor = AppColors.PrimaryContainer,
                         contentColor = AppColors.Primary,
-                        onClick = if (!isEmployee) { { navController.navigate(Screen.ManageUsers.route) } } else null
+                        onClick = if (!isEmployee) {
+                            { navController.navigate(Screen.ManageUsers.route) }
+                        } else null
                     ),
                     OverviewItem(
                         title = "Moderators",
@@ -108,7 +106,9 @@ fun AdminDashboardScreen(
                         icon = Icons.Default.SupervisorAccount,
                         containerColor = AppColors.WarningContainer,
                         contentColor = AppColors.Warning,
-                        onClick = if (!isEmployee) { { navController.navigate(Screen.ManageModerators.route) } } else null
+                        onClick = if (!isEmployee) {
+                            { navController.navigate(Screen.ManageModerators.route) }
+                        } else null
                     ),
                     OverviewItem(
                         title = "Products",
@@ -127,13 +127,14 @@ fun AdminDashboardScreen(
                         onClick = { navController.navigate(Screen.StockReport.route) }
                     ),
                     OverviewItem(
-//                        title = "Pending Orders",
                         title = "Orders",
                         value = stats.pendingOrders.toString(),
                         icon = Icons.Default.ShoppingCart,
                         containerColor = AppColors.InfoContainer,
                         contentColor = AppColors.Info,
-                        onClick = if (!isEmployee) { { navController.navigate(Screen.AdminOrders.route) } } else null
+                        onClick = if (!isEmployee) {
+                            { navController.navigate(Screen.AdminOrders.route) }
+                        } else null
                     ),
                     OverviewItem(
                         title = "Revenue (Rs.)",
@@ -141,7 +142,9 @@ fun AdminDashboardScreen(
                         icon = Icons.Default.AttachMoney,
                         containerColor = AppColors.SuccessContainer,
                         contentColor = AppColors.Success,
-                        onClick = if (!isEmployee) { { navController.navigate(Screen.ManagePayments.route) } } else null
+                        onClick = if (!isEmployee) {
+                            { navController.navigate(Screen.ManagePayments.route) }
+                        } else null
                     )
                 )
             }
@@ -191,9 +194,9 @@ fun AdminDashboardScreen(
                 if (isEmployee) {
                     adminMenuItems.filter {
                         it.route == Screen.ManageProducts.route ||
-                        it.route == Screen.ManageCategories.route ||
-                        it.route == Screen.StockReport.route ||
-                        it.route == Screen.AdminProfile.route
+                                it.route == Screen.ManageCategories.route ||
+                                it.route == Screen.StockReport.route ||
+                                it.route == Screen.AdminProfile.route
                     }
                 } else {
                     adminMenuItems
@@ -213,7 +216,9 @@ fun AdminDashboardScreen(
                     ) {
                         rowItems.forEach { item ->
                             Box(modifier = Modifier.weight(1f)) {
-                                QuickActionButton(item = item, onClick = { navController.navigate(item.route) })
+                                QuickActionButton(
+                                    item = item,
+                                    onClick = { navController.navigate(item.route) })
                             }
                         }
                         repeat(3 - rowItems.size) {

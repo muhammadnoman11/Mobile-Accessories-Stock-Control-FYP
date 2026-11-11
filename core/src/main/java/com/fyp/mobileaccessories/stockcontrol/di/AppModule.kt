@@ -17,16 +17,16 @@ import javax.inject.Singleton
 
 
 @Module
-@InstallIn(SingletonComponent::class)          // Lives as long as the app
+@InstallIn(SingletonComponent::class)
 object AppModule {
 
-    // ── Room Database ─────────────────────────────
+    /** Room Database */
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         AppDatabase.getDatabase(context)
 
-    // ── DAOs ──────────────────────────────────────
+    /** DAOs */
     @Provides
     fun provideUserDao(db: AppDatabase): UserDao = db.userDao()
     @Provides
@@ -46,13 +46,13 @@ object AppModule {
     @Provides
     fun provideStockMovementDao(db: AppDatabase): StockMovementDao = db.stockMovementDao()
 
-    // ── DataStore ─────────────────────────────────
+    /** DataStore */
     @Provides
     @Singleton
     fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
         context.dataStore
 
-    // ── Remote Sync Manager ────────────────────────
+    /** Remote Sync Manager */
     @Provides
     @Singleton
     fun provideRemoteSyncManager(

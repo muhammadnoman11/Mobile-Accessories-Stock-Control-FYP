@@ -32,7 +32,9 @@ fun ProductImage(
         )
     } else {
         Box(
-            modifier = modifier.background(AppColors.SurfaceVariant),
+            modifier = modifier
+                .background(
+                AppColors.SurfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Icon(

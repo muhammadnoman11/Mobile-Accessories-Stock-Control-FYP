@@ -1,11 +1,5 @@
 package com.fyp.mobileaccessories.stockcontrol.util
 
-// ============================================================
-// FILE: util/SessionManager.kt
-// DataStore-based session — persists logged-in user across app restarts
-// ============================================================
-
-
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -20,7 +14,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 
-// Extension property to create DataStore
+/** Extension property to create DataStore */
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_session")
 
 @Singleton
@@ -28,7 +22,7 @@ class SessionManager @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     @ApplicationContext private val context: Context
 ) {
-    // Preference keys for storing session data
+    /** Preference keys for storing session data */
     companion object {
         val KEY_USER_ID = intPreferencesKey("user_id")
         val KEY_USER_ROLE = stringPreferencesKey("user_role")
@@ -36,7 +30,7 @@ class SessionManager @Inject constructor(
         val KEY_USER_EMAIL = stringPreferencesKey("user_email")
     }
 
-    // Save session after successful login
+    /** Save session after successful login */
     suspend fun saveSession(userId: Int, role: String, name: String, email: String) {
         dataStore.edit { prefs ->
             prefs[KEY_USER_ID] = userId
@@ -50,7 +44,7 @@ class SessionManager @Inject constructor(
             .apply()
     }
 
-    // Clear session on logout
+    /** Clear session on logout */
     suspend fun clearSession() {
         dataStore.edit { it.clear() }
         context.getSharedPreferences("app_session", Context.MODE_PRIVATE)
@@ -59,7 +53,7 @@ class SessionManager @Inject constructor(
             .apply()
     }
 
-    // Observe session as Flow — auto-updates UI when session changes
+    /** Observe session as Flow — auto-updates UI when session changes */
     val sessionFlow: Flow<SessionData?> = dataStore.data.map { prefs ->
         val userId = prefs[KEY_USER_ID]
         val role = prefs[KEY_USER_ROLE]
@@ -74,10 +68,10 @@ class SessionManager @Inject constructor(
     }
 }
 
-// Session data holder
+/** Session data holder */
 data class SessionData(
     val userId: Int,
-    val role: String,       // "ADMIN", "MODERATOR", "USER"
+    val role: String,       /** "ADMIN", "MODERATOR", "USER" */
     val name: String,
     val email: String
 )

@@ -38,7 +38,6 @@ fun SectionHeader(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     query: String,

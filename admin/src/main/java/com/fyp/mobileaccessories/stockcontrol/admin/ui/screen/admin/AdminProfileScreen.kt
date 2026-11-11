@@ -35,10 +35,6 @@ import com.fyp.mobileaccessories.stockcontrol.navigation.Screen
 import com.fyp.mobileaccessories.stockcontrol.ui.component.AppTopBar
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
 
-// ============================================================
-// AdminProfileScreen
-// ============================================================
-
 @Composable
 fun AdminProfileScreen(
     navController: NavController,
@@ -60,7 +56,7 @@ fun AdminProfileScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Spacer(Modifier.height(16.dp))
-            // Avatar
+            /** Avatar */
             Box(
                 modifier = Modifier
                     .size(100.dp)

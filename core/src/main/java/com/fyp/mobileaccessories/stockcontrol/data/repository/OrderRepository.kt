@@ -41,28 +41,51 @@ class OrderRepository @Inject constructor(
     suspend fun updateOrderStatus(orderId: Int, status: String) {
         ensureOnline("update order status")
         val orderEntity = orderDao.getOrderById(orderId)
-        if (orderEntity?.status == "CANCELLED" && status in listOf("CONFIRMED", "DISPATCHED", "DELIVERED")) {
+        if (orderEntity?.status == "CANCELLED" && status in listOf(
+                "CONFIRMED",
+                "DISPATCHED",
+                "DELIVERED"
+            )
+        ) {
             throw Exception("Cannot update a cancelled order to $status. Orders must be restored first.")
         }
 
         orderDao.updateOrderStatus(orderId, status)
         remoteSyncManager.updateOrderStatus(orderId, status)
 
-        // Automatically sync corresponding transaction status
+        /** Automatically sync corresponding transaction status */
         val tx = transactionDao.getTransactionByOrderId(orderId)
         if (tx != null) {
             if (status == "DELIVERED") {
-                transactionDao.updateTransactionStatus(tx.id, "APPROVED", "Auto-approved upon successful order delivery")
-                remoteSyncManager.updateTransactionStatus(tx.id, "APPROVED", "Auto-approved upon successful order delivery")
+                transactionDao.updateTransactionStatus(
+                    tx.id,
+                    "APPROVED",
+                    "Auto-approved upon successful order delivery"
+                )
+                remoteSyncManager.updateTransactionStatus(
+                    tx.id,
+                    "APPROVED",
+                    "Auto-approved upon successful order delivery"
+                )
             } else if (status in listOf("CONFIRMED", "DISPATCHED") && tx.status == "PENDING") {
-                transactionDao.updateTransactionStatus(tx.id, "APPROVED", "Auto-approved via order status ($status)")
-                remoteSyncManager.updateTransactionStatus(tx.id, "APPROVED", "Auto-approved via order status ($status)")
+                transactionDao.updateTransactionStatus(
+                    tx.id,
+                    "APPROVED",
+                    "Auto-approved via order status ($status)"
+                )
+                remoteSyncManager.updateTransactionStatus(
+                    tx.id,
+                    "APPROVED",
+                    "Auto-approved via order status ($status)"
+                )
             } else if (status == "CANCELLED") {
-                val isCod = orderEntity?.paymentMode.orEmpty().contains("CASH", ignoreCase = true) ||
+                val isCod =
+                    orderEntity?.paymentMode.orEmpty().contains("CASH", ignoreCase = true) ||
                             orderEntity?.paymentMode.orEmpty().contains("COD", ignoreCase = true)
 
                 val newTxStatus = if (isCod) "CANCELLED" else "REFUND_PENDING"
-                val remarks = if (isCod) "COD Order Cancelled - No payment collected" else "Prepaid Order Cancelled - Refund Pending"
+                val remarks =
+                    if (isCod) "COD Order Cancelled - No payment collected" else "Prepaid Order Cancelled - Refund Pending"
 
                 transactionDao.updateTransactionStatus(tx.id, newTxStatus, remarks)
                 remoteSyncManager.updateTransactionStatus(tx.id, newTxStatus, remarks)
@@ -83,7 +106,10 @@ class OrderRepository @Inject constructor(
             val imageUrl = product?.imageUrl ?: ""
             val fcmToken = userRepository.getUserFcmToken(order.userId)
             if (fcmToken.isBlank()) {
-                Log.w("FCM_TOKEN", "No FCM token for user ${order.userId}; order status notification skipped")
+                Log.w(
+                    "FCM_TOKEN",
+                    "No FCM token for user ${order.userId}; order status notification skipped"
+                )
             } else {
                 Log.d("FCM_TOKEN", "Order status notify user ${order.userId}")
                 NotificationHelper.sendNotificationToUserDevice(

@@ -24,7 +24,6 @@ fun BaseSplashScreen(
     appTitle: String = "StockControl",
     subtitle: String = "Mobile Accessories",
     iconResId: Int,
-    footerText: String = "v1.0  ·  FYP Project"
 ) {
     val scale by rememberInfiniteTransition(label = "pulse").animateFloat(
         initialValue = 0.95f,
@@ -41,7 +40,10 @@ fun BaseSplashScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(AppColors.Primary, AppColors.PrimaryVariant)
+                    colors = listOf(
+                        AppColors.Primary,
+                        AppColors.PrimaryVariant
+                    )
                 )
             ),
         contentAlignment = Alignment.Center
@@ -54,7 +56,10 @@ fun BaseSplashScreen(
                 modifier = Modifier
                     .size(150.dp)
                     .scale(scale)
-                    .background(Color.White.copy(alpha = 0.8f), CircleShape),
+                    .background(
+                        Color.White.copy(alpha = 0.8f),
+                        CircleShape
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -64,7 +69,9 @@ fun BaseSplashScreen(
                 )
             }
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = appTitle,
                     fontSize = 32.sp,
@@ -88,42 +95,5 @@ fun BaseSplashScreen(
             )
         }
 
-        Text(
-            text = footerText,
-            style = MaterialTheme.typography.labelSmall,
-            color = Color.White.copy(alpha = 0.5f),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 32.dp)
-        )
-    }
-}
-
-@Composable
-fun DemoCredentialsCard(
-    title: String = "Demo Credentials",
-    credentialsText: String
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = AppColors.InfoContainer)
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text(
-                title,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold,
-                color = AppColors.Info
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                credentialsText,
-                style = MaterialTheme.typography.bodySmall,
-                color = AppColors.Info
-            )
-        }
     }
 }

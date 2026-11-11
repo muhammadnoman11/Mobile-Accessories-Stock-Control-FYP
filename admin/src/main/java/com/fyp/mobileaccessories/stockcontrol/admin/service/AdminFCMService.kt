@@ -5,7 +5,6 @@ import com.fyp.mobileaccessories.stockcontrol.admin.R
 import com.fyp.mobileaccessories.stockcontrol.util.NotificationTopics
 import com.github.muhammadnoman11.easyfirebasenotifier.receiver.EasyNotificationReceiver
 
-
 class AdminFCMService : EasyNotificationReceiver() {
     override fun getActivityClass() = MainActivity::class.java
     override fun getChannelId() = "admin_notifications_channel"

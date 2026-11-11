@@ -53,7 +53,10 @@ fun StatCard(
             Box(
                 modifier = Modifier
                     .size(42.dp)
-                    .background(contentColor.copy(alpha = 0.15f), RoundedCornerShape(12.dp)),
+                    .background(
+                        contentColor.copy(alpha = 0.15f),
+                        RoundedCornerShape(12.dp)
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -177,6 +180,7 @@ fun ProductCard(
                                 )
                             }
                         }
+
                         status == "PENDING" || !isApproved -> {
                             Surface(
                                 shape = RoundedCornerShape(20.dp),
@@ -348,131 +352,6 @@ fun UserCard(
                         )
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun GradientHeaderCard(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Brush.horizontalGradient(
-                        colors = listOf(AppColors.CardGradientStart, AppColors.CardGradientEnd)
-                    )
-                )
-                .padding(20.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Icon(
-                    icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp),
-                    tint = Color.White.copy(alpha = 0.9f)
-                )
-                Column {
-                    Text(
-                        title,
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        subtitle,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.8f)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ProductGridCard(
-    product: ProductEntity,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    val isOutOfStock = product.stockQuantity == 0
-
-    Card(
-        onClick = onClick,
-        modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
-                    .clip(RoundedCornerShape(10.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                ProductImage(
-                    imageUrl = product.imageUrl,
-                    contentDescription = product.name,
-                    modifier = Modifier.fillMaxSize(),
-                    iconSize = 36.dp
-                )
-                if (isOutOfStock) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                Color.Black.copy(alpha = 0.4f),
-                                RoundedCornerShape(10.dp)
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            "Out of Stock",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(8.dp))
-            Text(
-                product.name,
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                "Rs. ${"%,.0f".format(product.price)}",
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Bold,
-                color = AppColors.Primary
-            )
-            if (product.stockQuantity <= product.lowStockThreshold && !isOutOfStock) {
-                Text(
-                    "Only ${product.stockQuantity} left!",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = AppColors.Warning
-                )
             }
         }
     }

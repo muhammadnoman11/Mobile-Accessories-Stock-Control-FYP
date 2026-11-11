@@ -51,7 +51,6 @@ fun ModDashboardScreen(
                             listOf(Color(0xFFD97706), Color(0xFFEA580C))
                         )
                     )
-                    .statusBarsPadding()
                     .padding(24.dp)
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {

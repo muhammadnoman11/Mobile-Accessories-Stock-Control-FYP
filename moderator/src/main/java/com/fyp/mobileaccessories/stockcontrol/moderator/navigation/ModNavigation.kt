@@ -37,7 +37,7 @@ fun ModNavigation(
         navController = navController,
         startDestination = startDestination
     ) {
-        // ── AUTH ──────────────────────────────────
+        /** Authentication */
         composable(Screen.Splash.route) {
             SplashScreen(navController = navController)
         }
@@ -48,7 +48,7 @@ fun ModNavigation(
             RegisterScreen(navController = navController)
         }
 
-        // ── MODERATOR ─────────────────────────────
+        /** Moderator */
         composable(Screen.ModDashboard.route) {
             ModDashboardScreen(navController = navController)
         }
@@ -90,7 +90,7 @@ private fun RealtimeSessionObserver(navController: NavHostController) {
     }
 }
 
-// Helper extension to navigate and clear back stack
+/** Helper extension to navigate and clear back stack */
 fun NavController.navigateAndClear(route: String) {
     navigate(route) {
         popUpTo(0) { inclusive = true }

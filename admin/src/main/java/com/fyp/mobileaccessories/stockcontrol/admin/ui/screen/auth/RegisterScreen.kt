@@ -21,13 +21,6 @@ import com.fyp.mobileaccessories.stockcontrol.ui.component.DropdownField
 import com.fyp.mobileaccessories.stockcontrol.ui.component.PrimaryButton
 import com.fyp.mobileaccessories.stockcontrol.ui.theme.AppColors
 
-// ============================================================
-// FILE: presentation/auth/RegisterScreen.kt
-// User self-registration form — firstName, lastName, gender,
-// address, contactNo, email, password, confirmPassword.
-// Self-registration always creates USER role.
-// ============================================================
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
@@ -36,7 +29,7 @@ fun RegisterScreen(
 ) {
     val state by viewModel.registerState.collectAsStateWithLifecycle()
 
-    // After success, go to login so they sign in with new account
+    /** After success, go to login so they sign in with new account */
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) navController.navigateUp()
     }
@@ -73,7 +66,7 @@ fun RegisterScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Header text
+            /** Header text */
             Column {
                 Text("Join StockControl",
                     style = MaterialTheme.typography.titleLarge,
@@ -84,7 +77,7 @@ fun RegisterScreen(
                     color = AppColors.TextSecondary)
             }
 
-            // Error Banner
+            /** Error Banner */
             if (state.error != null) {
                 Surface(
                     color = AppColors.ErrorContainer,
@@ -103,7 +96,7 @@ fun RegisterScreen(
                 }
             }
 
-            // ── Section: Personal Info ────────────────────────
+            /** Personal Information Section */
             SectionLabel("Personal Information")
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -132,7 +125,7 @@ fun RegisterScreen(
                 )
             }
 
-            // Gender dropdown
+            /** Gender dropdown */
             DropdownField(
                 label = "Gender",
                 selectedValue = state.gender,
@@ -140,7 +133,7 @@ fun RegisterScreen(
                 onSelect = viewModel::onRegGender
             )
 
-            // ── Section: Contact Info ─────────────────────────
+            /** Contact Information Section */
             SectionLabel("Contact Information")
             AppTextField(
                 value = state.address,
@@ -158,7 +151,7 @@ fun RegisterScreen(
                 keyboardType = KeyboardType.Phone
             )
 
-            // ── Section: Account Credentials ─────────────────
+            /** Account Credentials Section */
             SectionLabel("Account Credentials")
             AppTextField(
                 value = state.email,
@@ -182,7 +175,7 @@ fun RegisterScreen(
                 isPassword = true
             )
 
-            // Role notice
+            /** Role notice */
             Surface(
                 color = AppColors.InfoContainer,
                 shape = RoundedCornerShape(8.dp)
@@ -208,7 +201,6 @@ fun RegisterScreen(
                 icon = Icons.Default.PersonAdd
             )
 
-            // Back to login link
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -226,7 +218,7 @@ fun RegisterScreen(
     }
 }
 
-// Small helper composable for section labels in the form
+/** Small helper composable for section labels in the form */
 @Composable
 private fun SectionLabel(text: String) {
     Text(

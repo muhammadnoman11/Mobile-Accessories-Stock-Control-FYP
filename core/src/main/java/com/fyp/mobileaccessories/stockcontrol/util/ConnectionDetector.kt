@@ -55,9 +55,9 @@ object ConnectionDetector {
         try {
             cm.registerNetworkCallback(request, callback)
         } catch (_: Exception) {
-            // Handle registration issues gracefully
+            /** Handle registration issues gracefully */
         }
-        // Emit initial state immediately
+        /** Emit initial state immediately */
         trySend(isConnected(context))
 
         awaitClose {
