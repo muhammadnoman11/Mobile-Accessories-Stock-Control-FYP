@@ -51,6 +51,12 @@ fun PlaceOrderScreen(
         viewModel.prefillAddress()
     }
 
+    LaunchedEffect(couriers) {
+        if (state.selectedCourierId == null && couriers.isNotEmpty()) {
+            viewModel.onCourierSelect(couriers.first().id)
+        }
+    }
+
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
             Toast.makeText(context, "Order #${state.orderId} placed successfully!", Toast.LENGTH_LONG).show()
